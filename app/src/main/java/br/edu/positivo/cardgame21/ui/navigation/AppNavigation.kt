@@ -1,4 +1,4 @@
-package br.edu.positivo.cardgame21.navigation
+package br.edu.positivo.cardgame21.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController

@@ -1,4 +1,4 @@
-package br.edu.positivo.cardgame21.navigation
+package br.edu.positivo.cardgame21.ui.navigation
 
 // Nomes das rotas do app, centralizados para não repetir texto pelo código.
 object Rotas {

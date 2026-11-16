@@ -1,4 +1,4 @@
-package br.edu.positivo.cardgame21.model
+package br.edu.positivo.cardgame21.logic
 
 enum class ValorCarta(
     val simbolo: String,

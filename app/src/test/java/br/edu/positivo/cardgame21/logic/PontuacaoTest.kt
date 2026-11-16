@@ -1,5 +1,5 @@
 
-package br.edu.positivo.cardgame21.model
+package br.edu.positivo.cardgame21.logic
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse

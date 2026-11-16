@@ -60,13 +60,25 @@ import br.edu.positivo.cardgame21.ui.theme.VerdeMesa
 import br.edu.positivo.cardgame21.ui.theme.VerdePainel
 import br.edu.positivo.cardgame21.ui.theme.VerdeTextoSuave
 
-// Só o visual da mesa: as cartas e os números abaixo são fixos, de exemplo.
+data class JogadorNaMesaUIData(
+    val nome: String,
+    val cartas: List<Pair<String, Naipe>>,
+    val situacao: String
+)
+
 @Composable
 fun JogoScreen(
     onSair: () -> Unit,
     modifier: Modifier = Modifier,
     onPedirCarta: () -> Unit = {},
-    onParar: () -> Unit = {}
+    onParar: () -> Unit = {},
+    nomeMesa: String = "Mesa K7Q2",
+    apostaAtual: Int = 50,
+    cartasVoce: List<Pair<String, Naipe>> = emptyList(),
+    pontosVoce: Int = 0,
+    jogadoresNaMesa: List<JogadorNaMesaUIData> = emptyList(),
+    cartasBanca: List<Pair<String, Naipe>> = listOf("?" to Naipe.ESPADAS), // Exemplo de carta virada
+    pontosBanca: String = "?"
 ) {
     Column(
         modifier = modifier
@@ -78,10 +90,10 @@ fun JogoScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         BarraTopo(
-            titulo = "Mesa K7Q2",
+            titulo = nomeMesa,
             descricaoVoltar = "Sair da mesa",
             onVoltar = onSair
-        ) { Pilula("500", icone = { FichaIcone() }) }
+        ) { Pilula(apostaAtual.toString(), icone = { FichaIcone() }) }
 
         // Banca
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -90,22 +102,24 @@ fun JogoScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text("BANCA", color = VerdeTextoSuave, fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
-                Text("Pontos: ?", color = CremeTexto, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                Text("Pontos: $pontosBanca", color = CremeTexto, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                CartaCostas()
-                CartaFrente("K", Naipe.ESPADAS)
+                // Cartas da banca
+                cartasBanca.forEach { (valor, naipe) ->
+                    if (valor == "?") CartaCostas() else CartaFrente(valor, naipe)
+                }
                 Spacer(Modifier.weight(1f))
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     CartaCostas(largura = 40.dp, altura = 58.dp)
-                    Text("Baralho: 46", color = VerdeTextoSuave, fontSize = 12.sp)
+                    Text("Baralho: 46", color = VerdeTextoSuave, fontSize = 12.sp) // Pode virar parâmetro depois
                 }
             }
         }
@@ -132,33 +146,36 @@ fun JogoScreen(
                 .height(IntrinsicSize.Min),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            JogadorNaMesa(
-                nome = "maria",
-                cartas = listOf("10" to Naipe.COPAS, "8" to Naipe.PAUS),
-                situacao = "Parou · 18",
-                modifier = Modifier.weight(1f)
-            )
-            JogadorNaMesa(
-                nome = "joão",
-                cartas = listOf("5" to Naipe.OUROS, "9" to Naipe.ESPADAS),
-                situacao = "Aguardando · 14",
-                modifier = Modifier.weight(1f)
-            )
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .bordaTracejada(VerdeBorda, raio = 10.dp, espessura = 1.5.dp)
-                    .padding(8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    "Lugar vazio",
-                    color = VerdeTextoSuave,
-                    fontSize = 12.sp,
-                    fontStyle = FontStyle.Italic,
-                    textAlign = TextAlign.Center
+            jogadoresNaMesa.forEach { jogador ->
+                JogadorNaMesa(
+                    nome = jogador.nome,
+                    cartas = jogador.cartas,
+                    situacao = jogador.situacao,
+                    modifier = Modifier.weight(1f)
                 )
+            }
+
+            // Preenche os lugares vazios até ter 2 oponentes na tela
+            val lugaresVazios = 2 - jogadoresNaMesa.size
+            if (lugaresVazios > 0) {
+                repeat(lugaresVazios) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .bordaTracejada(VerdeBorda, raio = 10.dp, espessura = 1.5.dp)
+                            .padding(8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            "Lugar vazio",
+                            color = VerdeTextoSuave,
+                            fontSize = 12.sp,
+                            fontStyle = FontStyle.Italic,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
             }
         }
 
@@ -177,11 +194,12 @@ fun JogoScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text("VOCÊ · jogador21", color = Dourado, fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
-                Text("Pontos: 15", color = CremeTexto, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                Text("Pontos: $pontosVoce", color = CremeTexto, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                CartaFrente("7", Naipe.COPAS)
-                CartaFrente("8", Naipe.PAUS)
+                cartasVoce.forEach { (valor, naipe) ->
+                    CartaFrente(valor, naipe)
+                }
                 CartaVazia("próxima carta")
             }
         }
@@ -206,7 +224,7 @@ fun JogoScreen(
                         .border(3.dp, Creme, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("50", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+                    Text(apostaAtual.toString(), color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.Bold)
                 }
                 BotaoQuadrado("+", "Aumentar aposta")
             }
@@ -235,7 +253,6 @@ fun JogoScreen(
     }
 }
 
-// Painel de um adversário: nome, cartas pequenas e situação.
 @Composable
 private fun JogadorNaMesa(
     nome: String,
@@ -262,7 +279,6 @@ private fun JogadorNaMesa(
     }
 }
 
-// Botão quadrado com um símbolo (− ou +). Ainda não faz nada.
 @Composable
 private fun BotaoQuadrado(simbolo: String, descricao: String) {
     val forma = RoundedCornerShape(10.dp)
@@ -283,5 +299,15 @@ private fun BotaoQuadrado(simbolo: String, descricao: String) {
 @Preview(showBackground = true, widthDp = 390, heightDp = 844)
 @Composable
 private fun JogoScreenPreview() {
-    Jogo21Theme { JogoScreen(onSair = {}) }
+    Jogo21Theme {
+        JogoScreen(
+            onSair = {},
+            cartasVoce = listOf("7" to Naipe.COPAS, "8" to Naipe.PAUS),
+            pontosVoce = 15,
+            jogadoresNaMesa = listOf(
+                JogadorNaMesaUIData("maria", listOf("10" to Naipe.COPAS, "8" to Naipe.PAUS), "Parou · 18"),
+                JogadorNaMesaUIData("joão", listOf("5" to Naipe.OUROS, "9" to Naipe.ESPADAS), "Aguardando · 14")
+            )
+        )
+    }
 }

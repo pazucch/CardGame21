@@ -13,17 +13,14 @@ import kotlinx.coroutines.flow.Flow
 interface PartidaDao
 {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun inserir(jogador: PartidaEntity): Long
+    suspend fun inserir(partida: PartidaEntity): Long
 
-    @Query("SELECT * FROM jogadores")
-    fun listartodos(): Flow<List<PartidaEntity>>
+    @Query("SELECT * FROM partidas ORDER BY pontos DESC")
+    fun listarPlacar(): Flow<List<PartidaEntity>>
 
     @Update
-    suspend fun atualizar(jogador: PartidaEntity)
+    suspend fun atualizar(partida: PartidaEntity)
 
     @Delete
-    suspend fun deletar(jogador: PartidaEntity)
-
-    @Query("SELECT * FROM jogadores WHERE id = :id")
-    suspend fun buscaPorId(id: Long): PartidaEntity?
+    suspend fun deletar(partida: PartidaEntity)
 }

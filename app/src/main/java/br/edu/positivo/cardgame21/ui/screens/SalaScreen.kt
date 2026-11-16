@@ -48,22 +48,20 @@ import br.edu.positivo.cardgame21.ui.theme.VerdeMesa
 import br.edu.positivo.cardgame21.ui.theme.VerdePainel
 import br.edu.positivo.cardgame21.ui.theme.VerdeTextoSuave
 
-// Dados de exemplo só para desenhar a tela (a lista real virá depois).
-private data class JogadorSala(val nome: String, val anfitriao: Boolean = false)
-
 private const val LUGARES_NA_MESA = 4
 
 @Composable
 fun SalaScreen(
     onVoltar: () -> Unit,
     onIniciarPartida: () -> Unit,
+    jogadores: List<String> = emptyList(),
+    codigoMesa: String = "",
     modifier: Modifier = Modifier,
     onCriarMesa: () -> Unit = {},
     onEntrarComCodigo: (String) -> Unit = {},
     onCompartilhar: () -> Unit = {}
 ) {
     var codigo by rememberSaveable { mutableStateOf("") }
-    val jogadores = listOf(JogadorSala("jogador21", anfitriao = true), JogadorSala("maria"))
 
     Column(
         modifier = modifier
@@ -82,7 +80,6 @@ fun SalaScreen(
 
         BotaoPrincipal("CRIAR MESA", onCriarMesa, Modifier.fillMaxWidth())
 
-        // Entrar em uma mesa com código
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text("Entrar com código", color = CremeTexto, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
             Row(
@@ -106,7 +103,6 @@ fun SalaScreen(
             }
         }
 
-        // Mesa criada: código e jogadores
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -130,7 +126,7 @@ fun SalaScreen(
                         letterSpacing = 1.5.sp
                     )
                     Text(
-                        "K7Q2",
+                        text = if (codigoMesa.isNotBlank()) codigoMesa else "----",
                         color = Dourado,
                         fontFamily = FonteTitulo,
                         fontWeight = FontWeight.Bold,
@@ -154,7 +150,10 @@ fun SalaScreen(
                     fontWeight = FontWeight.Bold
                 )
                 repeat(LUGARES_NA_MESA) { posicao ->
-                    LinhaJogador(jogadores.getOrNull(posicao))
+                    LinhaJogador(
+                        nomeJogador = jogadores.getOrNull(posicao),
+                        isAnfitriao = posicao == 0 // O primeiro da lista é o anfitrião
+                    )
                 }
             }
 
@@ -170,10 +169,9 @@ fun SalaScreen(
     }
 }
 
-// Uma linha da lista: jogador sentado ou lugar vazio (quando jogador é nulo).
 @Composable
-private fun LinhaJogador(jogador: JogadorSala?) {
-    if (jogador != null) {
+private fun LinhaJogador(nomeJogador: String?, isAnfitriao: Boolean = false) {
+    if (nomeJogador != null) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -186,19 +184,19 @@ private fun LinhaJogador(jogador: JogadorSala?) {
                     .size(34.dp)
                     .clip(CircleShape)
                     .background(VerdeMesa)
-                    .border(2.dp, if (jogador.anfitriao) Dourado else VerdeBorda, CircleShape),
+                    .border(2.dp, if (isAnfitriao) Dourado else VerdeBorda, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    jogador.nome.first().uppercase(),
-                    color = if (jogador.anfitriao) Dourado else CremeTexto,
+                    text = nomeJogador.first().uppercase(),
+                    color = if (isAnfitriao) Dourado else CremeTexto,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
                 )
             }
             Row(modifier = Modifier.weight(1f)) {
-                Text(jogador.nome, color = CremeTexto, fontSize = 15.sp)
-                if (jogador.anfitriao) {
+                Text(nomeJogador, color = CremeTexto, fontSize = 15.sp)
+                if (isAnfitriao) {
                     Text(" · anfitrião", color = VerdeTextoSuave, fontSize = 15.sp)
                 }
             }
@@ -223,9 +221,11 @@ private fun LinhaJogador(jogador: JogadorSala?) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Box(modifier = Modifier
-                .size(34.dp)
-                .bordaTracejada(VerdeBorda, raio = 17.dp))
+            Box(
+                modifier = Modifier
+                    .size(34.dp)
+                    .bordaTracejada(VerdeBorda, raio = 17.dp)
+            )
             Text(
                 "Aguardando jogador…",
                 color = VerdeTextoSuave,
@@ -239,5 +239,12 @@ private fun LinhaJogador(jogador: JogadorSala?) {
 @Preview(showBackground = true, widthDp = 390, heightDp = 844)
 @Composable
 private fun SalaScreenPreview() {
-    Jogo21Theme { SalaScreen(onVoltar = {}, onIniciarPartida = {}) }
+    Jogo21Theme {
+        SalaScreen(
+            onVoltar = {},
+            onIniciarPartida = {},
+            jogadores = listOf("jogador21", "maria"),
+            codigoMesa = "K7Q2"
+        )
+    }
 }

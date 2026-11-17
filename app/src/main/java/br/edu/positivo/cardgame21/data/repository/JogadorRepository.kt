@@ -5,7 +5,6 @@ import br.edu.positivo.cardgame21.data.local.entity.JogadorEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
-import br.edu.positivo.cardgame21.data.error.AppError
 import br.edu.positivo.cardgame21.data.error.ErrorHandler
 import kotlinx.coroutines.CancellationException
 
@@ -24,18 +23,22 @@ class JogadorRepository(
 
             Result.success(criado)
 
-        } catch (erro: kotlinx.coroutines.CancellationException) {
+        } catch (erro: CancellationException) {
             throw erro
 
         } catch (erro: Exception) {
-            Result.failure(erro)
+            Result.failure(ErrorHandler.tratar(erro))
         }
     }
 
     fun listarJogadores(): Flow<Result<List<JogadorEntity>>> =
         jogadorDao.listarTodos()
             .map { lista -> Result.success(lista) }
-            .catch { e -> emit(Result.failure(e)) }
+            .catch { erro ->
+                if (erro is CancellationException) throw erro
+
+                emit(Result.failure(ErrorHandler.tratar(erro)))
+            }
 
     suspend fun buscarPorNome(nome: String): Result<JogadorEntity?> {
         return try {
@@ -53,7 +56,9 @@ class JogadorRepository(
                 Result.success(lista)
             }
             .catch { erro ->
-                emit(Result.failure(erro))
+                if (erro is CancellationException) throw erro
+
+                emit(Result.failure(ErrorHandler.tratar(erro)))
             }
 
 
@@ -74,8 +79,11 @@ class JogadorRepository(
         return try {
             jogadorDao.atualizar(jogador)
             Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
+        } catch (erro: CancellationException) {
+            throw erro
+
+        } catch (erro: Exception) {
+            Result.failure(ErrorHandler.tratar(erro))
         }
     }
 
@@ -83,8 +91,11 @@ class JogadorRepository(
         return try {
             jogadorDao.deletar(jogador)
             Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
+        } catch (erro: CancellationException) {
+            throw erro
+
+        } catch (erro: Exception) {
+            Result.failure(ErrorHandler.tratar(erro))
         }
     }
 }

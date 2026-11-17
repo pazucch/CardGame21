@@ -2,6 +2,8 @@ package br.edu.positivo.cardgame21.data.repository
 
 import br.edu.positivo.cardgame21.data.local.dao.PartidaDao
 import br.edu.positivo.cardgame21.data.local.entity.PartidaEntity
+import br.edu.positivo.cardgame21.data.error.ErrorHandler
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -12,8 +14,11 @@ class PartidaRepository(
     fun listarPlacar(): Flow<Result<List<PartidaEntity>>> =
         partidaDao.listarPlacar()
             .map { lista -> Result.success(lista) }
-            .catch { e -> emit(Result.failure(e)) }
+            .catch { erro ->
+                if (erro is CancellationException) throw erro
 
+                emit(Result.failure(ErrorHandler.tratar(erro)))
+            }
     fun listarPartidasPorJogador(
         jogadorId: Long
     ): Flow<Result<List<PartidaEntity>>> =
@@ -22,7 +27,9 @@ class PartidaRepository(
                 Result.success(partidas)
             }
             .catch { erro ->
-                emit(Result.failure(erro))
+                if (erro is CancellationException) throw erro
+
+                emit(Result.failure(ErrorHandler.tratar(erro)))
             }
 
     suspend fun buscarPartidaPorId(
@@ -32,8 +39,11 @@ class PartidaRepository(
             Result.success(
                 partidaDao.buscarPorId(id)
             )
+        } catch (erro: CancellationException) {
+            throw erro
+
         } catch (erro: Exception) {
-            Result.failure(erro)
+            Result.failure(ErrorHandler.tratar(erro))
         }
     }
 
@@ -41,24 +51,33 @@ class PartidaRepository(
         return try {
             val id = partidaDao.inserir(partida)
             Result.success(id)
-        } catch (e: Exception) {
-            Result.failure(e)
+        } catch (erro: CancellationException) {
+            throw erro
+
+        } catch (erro: Exception) {
+            Result.failure(ErrorHandler.tratar(erro))
         }
     }
     suspend fun atualizarPartida(partida: PartidaEntity): Result<Unit> {
         return try {
             partidaDao.atualizar(partida)
             Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
+        } catch (erro: CancellationException) {
+            throw erro
+
+        } catch (erro: Exception) {
+            Result.failure(ErrorHandler.tratar(erro))
         }
     }
     suspend fun deletarPartida(partida: PartidaEntity): Result<Unit> {
         return try {
             partidaDao.deletar(partida)
             Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
+        } catch (erro: CancellationException) {
+            throw erro
+
+        } catch (erro: Exception) {
+            Result.failure(ErrorHandler.tratar(erro))
         }
     }
 }

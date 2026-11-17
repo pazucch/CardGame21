@@ -18,4 +18,7 @@ class AppContainer(context: Context) {
     val partidaRepository = PartidaRepository(
         database.partidaDao()
     )
+
+    val viewModelFactory = ViewModelFactory()
+
 }

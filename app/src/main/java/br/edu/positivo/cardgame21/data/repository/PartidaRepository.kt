@@ -2,6 +2,7 @@ package br.edu.positivo.cardgame21.data.repository
 
 import br.edu.positivo.cardgame21.data.local.dao.PartidaDao
 import br.edu.positivo.cardgame21.data.local.entity.PartidaEntity
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -32,6 +33,8 @@ class PartidaRepository(
             Result.success(
                 partidaDao.buscarPorId(id)
             )
+        } catch (cancelamento: CancellationException) {
+            throw cancelamento
         } catch (erro: Exception) {
             Result.failure(erro)
         }
@@ -41,6 +44,8 @@ class PartidaRepository(
         return try {
             val id = partidaDao.inserir(partida)
             Result.success(id)
+        } catch (cancelamento: CancellationException) {
+            throw cancelamento
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -49,6 +54,8 @@ class PartidaRepository(
         return try {
             partidaDao.atualizar(partida)
             Result.success(Unit)
+        } catch (cancelamento: CancellationException) {
+            throw cancelamento
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -57,6 +64,8 @@ class PartidaRepository(
         return try {
             partidaDao.deletar(partida)
             Result.success(Unit)
+        } catch (cancelamento: CancellationException) {
+            throw cancelamento
         } catch (e: Exception) {
             Result.failure(e)
         }

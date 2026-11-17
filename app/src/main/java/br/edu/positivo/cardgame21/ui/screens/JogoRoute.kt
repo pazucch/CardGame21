@@ -23,12 +23,17 @@ fun JogoRoute(onSair: () -> Unit, gameViewModel: GameViewModel) {
         if (!estado.temMesa) onSair()
     }
     var confirmarSaida by rememberSaveable { mutableStateOf(false) }
+    var confirmarDescarte by rememberSaveable { mutableStateOf(false) }
     val sair = {
-        gameViewModel.sairDaPartida()
-        onSair()
+        if (!estado.salvando) {
+            gameViewModel.sairDaPartida()
+            onSair()
+        }
     }
     val solicitarSaida = {
-        if (estado.fase == FaseRodada.JOGADOR || estado.fase == FaseRodada.BANCA) {
+        if (estado.salvando) {
+            // Aguarda a gravação terminar antes de liberar a saída.
+        } else if (estado.carregando || estado.erroSalvar != null || estado.fase == FaseRodada.JOGADOR || estado.fase == FaseRodada.BANCA) {
             confirmarSaida = true
         } else sair()
     }
@@ -37,12 +42,24 @@ fun JogoRoute(onSair: () -> Unit, gameViewModel: GameViewModel) {
         AlertDialog(
             onDismissRequest = { confirmarSaida = false },
             title = { Text("Sair da partida?") },
-            text = { Text("A rodada atual será abandonada. Sua mesa e aposta serão mantidas na sala.") },
+            text = { Text("A rodada e qualquer resultado ainda não salvo serão descartados. Sua mesa e aposta serão mantidas na sala.") },
             confirmButton = { TextButton(onClick = { confirmarSaida = false; sair() }) { Text("Sair") } },
             dismissButton = { TextButton(onClick = { confirmarSaida = false }) { Text("Continuar jogando") } }
         )
     }
-    val mensagem = estado.erro ?: when (estado.resultado) {
+    if (confirmarDescarte) {
+        AlertDialog(
+            onDismissRequest = { confirmarDescarte = false },
+            title = { Text("Continuar sem salvar?") },
+            text = { Text("O resultado desta rodada não aparecerá no histórico.") },
+            confirmButton = { TextButton(onClick = {
+                confirmarDescarte = false
+                gameViewModel.descartarSalvamento()
+            }) { Text("Descartar resultado") } },
+            dismissButton = { TextButton(onClick = { confirmarDescarte = false }) { Text("Voltar") } }
+        )
+    }
+    val mensagem = if (estado.carregando) "Preparando o baralho…" else estado.erro ?: when (estado.resultado) {
         ResultadoRodada.VITORIA -> "Você venceu!"
         ResultadoRodada.DERROTA -> if (estado.pontosJogador > 21) "Você estourou!" else "A banca venceu"
         ResultadoRodada.EMPATE -> "Empate!"
@@ -56,6 +73,15 @@ fun JogoRoute(onSair: () -> Unit, gameViewModel: GameViewModel) {
         onAumentarAposta = gameViewModel::aumentarAposta,
         onDiminuirAposta = gameViewModel::diminuirAposta,
         apostaAtual = estado.aposta,
+        podeNovaRodada = !estado.ocupado && estado.erroSalvar == null,
+        informacao = listOfNotNull(
+            if (estado.baralhoLocal) "API indisponível. Rodada usando o baralho local." else null,
+            estado.aviso,
+            if (estado.salvando) "Salvando partida…" else if (estado.partidaSalva) "Partida salva no histórico." else null
+        ).joinToString("\n").takeIf { it.isNotBlank() },
+        erroSalvar = estado.erroSalvar,
+        onTentarSalvar = gameViewModel::salvarPartida,
+        onDescartarSalvamento = { confirmarDescarte = true },
         cartasVoce = estado.cartasJogador.map { it.valor.simbolo to it.naipe },
         pontosVoce = estado.pontosJogador,
         cartasBanca = estado.cartasBanca.mapIndexed { indice, carta ->

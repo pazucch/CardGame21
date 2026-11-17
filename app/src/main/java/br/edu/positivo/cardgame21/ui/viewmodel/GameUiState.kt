@@ -15,14 +15,22 @@ data class GameUiState(
     val fase: FaseRodada = FaseRodada.AGUARDANDO,
     val resultado: ResultadoRodada? = null,
     val cartasRestantes: Int = 52,
-    val erro: String? = null
+    val erro: String? = null,
+    val carregando: Boolean = false,
+    val identificandoJogador: Boolean = false,
+    val salvando: Boolean = false,
+    val partidaSalva: Boolean = false,
+    val erroSalvar: String? = null,
+    val aviso: String? = null,
+    val baralhoLocal: Boolean = false
 ) {
     val temMesa: Boolean get() = codigoMesa.isNotBlank()
-    val podeIniciar: Boolean get() = temMesa && fase == FaseRodada.AGUARDANDO
-    val podeAlterarAposta: Boolean get() = temMesa &&
+    val podeIniciar: Boolean get() = temMesa && fase == FaseRodada.AGUARDANDO && !ocupado
+    val ocupado: Boolean get() = carregando || salvando || identificandoJogador
+    val podeAlterarAposta: Boolean get() = temMesa && !ocupado &&
         (fase == FaseRodada.AGUARDANDO || fase == FaseRodada.ENCERRADA)
     val pontosJogador: Int get() = Pontuacao.calcular(cartasJogador)
     val pontosBanca: Int get() = Pontuacao.calcular(cartasBanca)
-    val podeJogar: Boolean get() = fase == FaseRodada.JOGADOR
+    val podeJogar: Boolean get() = fase == FaseRodada.JOGADOR && !ocupado
     val revelarBanca: Boolean get() = fase != FaseRodada.JOGADOR
 }

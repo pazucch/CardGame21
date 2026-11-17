@@ -90,7 +90,12 @@ fun JogoScreen(
     podeJogar: Boolean = true,
     rodadaEncerrada: Boolean = false,
     onNovaRodada: () -> Unit = {},
-    podeAlterarAposta: Boolean = false
+    podeAlterarAposta: Boolean = false,
+    podeNovaRodada: Boolean = true,
+    informacao: String? = null,
+    erroSalvar: String? = null,
+    onTentarSalvar: () -> Unit = {},
+    onDescartarSalvamento: () -> Unit = {}
 ) {
     Column(
         modifier = modifier
@@ -149,6 +154,13 @@ fun JogoScreen(
         ) {
             Text(mensagemStatus, color = Preto, fontSize = 17.sp, fontWeight = FontWeight.Bold)
             Text(dicaStatus, color = Color(0xFF2B2B2B), fontSize = 13.sp)
+        }
+
+        informacao?.let { Text(it, color = CremeTexto, fontSize = 14.sp) }
+        erroSalvar?.let {
+            Text(it, color = CremeTexto, fontSize = 14.sp)
+            BotaoPrincipal("TENTAR SALVAR NOVAMENTE", onTentarSalvar, Modifier.fillMaxWidth())
+            BotaoSecundario("CONTINUAR SEM SALVAR", onDescartarSalvamento, Modifier.fillMaxWidth())
         }
 
         // Outros jogadores
@@ -265,7 +277,7 @@ fun JogoScreen(
             )
         }
         if (rodadaEncerrada) {
-            BotaoPrincipal("NOVA RODADA", onNovaRodada, Modifier.fillMaxWidth())
+            BotaoPrincipal("NOVA RODADA", onNovaRodada, Modifier.fillMaxWidth(), enabled = podeNovaRodada)
         }
     }
 }

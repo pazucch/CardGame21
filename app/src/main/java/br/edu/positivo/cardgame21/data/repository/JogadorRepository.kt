@@ -2,6 +2,7 @@ package br.edu.positivo.cardgame21.data.repository
 
 import br.edu.positivo.cardgame21.data.local.dao.JogadorDao
 import br.edu.positivo.cardgame21.data.local.entity.JogadorEntity
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -17,6 +18,8 @@ class JogadorRepository(
     suspend fun buscarPorNome(nome: String): Result<JogadorEntity?> {
         return try {
             Result.success(jogadorDao.buscaPorNome(nome))
+        } catch (cancelamento: CancellationException) {
+            throw cancelamento
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -37,6 +40,8 @@ class JogadorRepository(
         return try {
             val id = jogadorDao.inserir(jogador)
             Result.success(id)
+        } catch (cancelamento: CancellationException) {
+            throw cancelamento
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -46,6 +51,8 @@ class JogadorRepository(
         return try {
             jogadorDao.atualizar(jogador)
             Result.success(Unit)
+        } catch (cancelamento: CancellationException) {
+            throw cancelamento
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -55,6 +62,8 @@ class JogadorRepository(
         return try {
             jogadorDao.deletar(jogador)
             Result.success(Unit)
+        } catch (cancelamento: CancellationException) {
+            throw cancelamento
         } catch (e: Exception) {
             Result.failure(e)
         }

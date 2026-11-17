@@ -90,8 +90,8 @@ fun AppNavigation() {
         ) {
             composable(Rotas.LOGIN) {
                 LoginScreen(
-                    onEntrar = { nome, _ ->
-                        gameViewModel.definirJogador(nome)
+                    onEntrar = { nome, senha ->
+                        gameViewModel.definirJogador(nome, senha)
                         navController.entrarNaSala()
                     },
                     onCriarConta = { navController.navigate(Rotas.CRIAR_USUARIO) },

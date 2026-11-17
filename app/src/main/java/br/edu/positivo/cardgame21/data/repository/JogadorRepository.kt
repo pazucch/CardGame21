@@ -5,6 +5,9 @@ import br.edu.positivo.cardgame21.data.local.entity.JogadorEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import br.edu.positivo.cardgame21.data.error.AppError
+import br.edu.positivo.cardgame21.data.error.ErrorHandler
+import kotlinx.coroutines.CancellationException
 
 class JogadorRepository(
     private val jogadorDao: JogadorDao
@@ -53,14 +56,19 @@ class JogadorRepository(
                 emit(Result.failure(erro))
             }
 
+
     suspend fun inserirJogador(jogador: JogadorEntity): Result<Long> {
         return try {
-            val id = jogadorDao.inserir(jogador)
-            Result.success(id)
-        } catch (e: Exception) {
-            Result.failure(e)
+            Result.success(jogadorDao.inserir(jogador))
+
+        } catch (erro: CancellationException) {
+            throw erro
+
+        } catch (erro: Exception) {
+            Result.failure(ErrorHandler.tratar(erro))
         }
     }
+
 
     suspend fun atualizarJogador(jogador: JogadorEntity): Result<Unit> {
         return try {

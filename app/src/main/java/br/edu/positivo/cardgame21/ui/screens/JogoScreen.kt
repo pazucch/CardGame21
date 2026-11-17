@@ -45,7 +45,7 @@ import br.edu.positivo.cardgame21.ui.components.CartaFrente
 import br.edu.positivo.cardgame21.ui.components.CartaMini
 import br.edu.positivo.cardgame21.ui.components.CartaVazia
 import br.edu.positivo.cardgame21.ui.components.FichaIcone
-import br.edu.positivo.cardgame21.ui.components.Naipe
+import br.edu.positivo.cardgame21.logic.Naipe
 import br.edu.positivo.cardgame21.ui.components.Pilula
 import br.edu.positivo.cardgame21.ui.components.bordaTracejada
 import br.edu.positivo.cardgame21.ui.theme.Creme
@@ -78,7 +78,13 @@ fun JogoScreen(
     pontosVoce: Int = 0,
     jogadoresNaMesa: List<JogadorNaMesaUIData> = emptyList(),
     cartasBanca: List<Pair<String, Naipe>> = listOf("?" to Naipe.ESPADAS), // Exemplo de carta virada
-    pontosBanca: String = "?"
+    pontosBanca: String = "?",
+    nomeJogador: String = "Jogador",
+    cartasRestantes: Int = 52,
+    mensagemStatus: String = "Sua vez",
+    dicaStatus: String = "Chegue o mais perto de 21 sem passar",
+    onAumentarAposta: () -> Unit = {},
+    onDiminuirAposta: () -> Unit = {}
 ) {
     Column(
         modifier = modifier
@@ -119,7 +125,7 @@ fun JogoScreen(
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     CartaCostas(largura = 40.dp, altura = 58.dp)
-                    Text("Baralho: 46", color = VerdeTextoSuave, fontSize = 12.sp) // Pode virar parâmetro depois
+                    Text("Baralho: $cartasRestantes", color = VerdeTextoSuave, fontSize = 12.sp)
                 }
             }
         }
@@ -135,8 +141,8 @@ fun JogoScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text("Sua vez", color = Preto, fontSize = 17.sp, fontWeight = FontWeight.Bold)
-            Text("Chegue o mais perto de 21 sem passar", color = Color(0xFF2B2B2B), fontSize = 13.sp)
+            Text(mensagemStatus, color = Preto, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+            Text(dicaStatus, color = Color(0xFF2B2B2B), fontSize = 13.sp)
         }
 
         // Outros jogadores
@@ -193,7 +199,7 @@ fun JogoScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("VOCÊ · jogador21", color = Dourado, fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
+                Text("VOCÊ · $nomeJogador", color = Dourado, fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
                 Text("Pontos: $pontosVoce", color = CremeTexto, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -215,7 +221,7 @@ fun JogoScreen(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                BotaoQuadrado("−", "Diminuir aposta")
+                BotaoQuadrado("−", "Diminuir aposta", onDiminuirAposta)
                 Box(
                     modifier = Modifier
                         .size(52.dp)
@@ -226,7 +232,7 @@ fun JogoScreen(
                 ) {
                     Text(apostaAtual.toString(), color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.Bold)
                 }
-                BotaoQuadrado("+", "Aumentar aposta")
+                BotaoQuadrado("+", "Aumentar aposta", onAumentarAposta)
             }
         }
 
@@ -280,7 +286,7 @@ private fun JogadorNaMesa(
 }
 
 @Composable
-private fun BotaoQuadrado(simbolo: String, descricao: String) {
+private fun BotaoQuadrado(simbolo: String, descricao: String, onClick: () -> Unit) {
     val forma = RoundedCornerShape(10.dp)
     Box(
         modifier = Modifier
@@ -288,7 +294,7 @@ private fun BotaoQuadrado(simbolo: String, descricao: String) {
             .clip(forma)
             .background(VerdePainel)
             .border(2.dp, VerdeBorda, forma)
-            .clickable(role = Role.Button, onClick = {})
+            .clickable(role = Role.Button, onClick = onClick)
             .semantics { contentDescription = descricao },
         contentAlignment = Alignment.Center
     ) {

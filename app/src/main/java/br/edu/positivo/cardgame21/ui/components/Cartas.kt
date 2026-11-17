@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import br.edu.positivo.cardgame21.logic.Naipe
 import br.edu.positivo.cardgame21.ui.theme.BordaCarta
 import br.edu.positivo.cardgame21.ui.theme.CartaCostas
 import br.edu.positivo.cardgame21.ui.theme.CartaCostasClara
@@ -32,14 +33,6 @@ import br.edu.positivo.cardgame21.ui.theme.Preto
 import br.edu.positivo.cardgame21.ui.theme.Vermelho
 import br.edu.positivo.cardgame21.ui.theme.VerdeBorda
 import br.edu.positivo.cardgame21.ui.theme.VerdeTextoSuave
-
-// Os quatro naipes. O "︎" força o símbolo a aparecer como texto
-enum class Naipe(val simbolo: String, val vermelho: Boolean) {
-    ESPADAS("♠︎", false),
-    COPAS("♥︎", true),
-    OUROS("♦︎", true),
-    PAUS("♣︎", false)
-}
 
 // Carta aberta, com valor e naipe.
 @Composable

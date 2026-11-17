@@ -35,7 +35,7 @@ import br.edu.positivo.cardgame21.ui.components.BotaoSecundario
 import br.edu.positivo.cardgame21.ui.components.CampoTexto
 import br.edu.positivo.cardgame21.ui.components.CaixaErro
 import br.edu.positivo.cardgame21.ui.components.CartaFrente
-import br.edu.positivo.cardgame21.ui.components.Naipe
+import br.edu.positivo.cardgame21.logic.Naipe
 import br.edu.positivo.cardgame21.ui.theme.CremeTexto
 import br.edu.positivo.cardgame21.ui.theme.Dimens
 import br.edu.positivo.cardgame21.ui.theme.Dourado
@@ -47,7 +47,7 @@ import br.edu.positivo.cardgame21.ui.theme.VerdeTextoSuave
 
 @Composable
 fun LoginScreen(
-    onEntrar: () -> Unit,
+    onEntrar: (usuario: String, senha: String) -> Unit,
     onCriarConta: () -> Unit,
     onConvidado: () -> Unit,
     modifier: Modifier = Modifier,
@@ -135,7 +135,7 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            BotaoPrincipal("ENTRAR", onEntrar, Modifier.fillMaxWidth())
+            BotaoPrincipal("ENTRAR", { onEntrar(usuario, senha) }, Modifier.fillMaxWidth())
             BotaoSecundario("Criar conta", onCriarConta, Modifier.fillMaxWidth())
             BotaoLink("Jogar como convidado", onConvidado)
         }
@@ -146,6 +146,6 @@ fun LoginScreen(
 @Composable
 private fun LoginScreenPreview() {
     Jogo21Theme {
-        LoginScreen(onEntrar = {}, onCriarConta = {}, onConvidado = {}, mensagemErro = "Usuário ou senha incorretos")
+        LoginScreen(onEntrar = { _, _ -> }, onCriarConta = {}, onConvidado = {}, mensagemErro = "Usuário ou senha incorretos")
     }
 }

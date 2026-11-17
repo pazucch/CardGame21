@@ -10,11 +10,17 @@ class JogadorRepository(
     private val jogadorDao: JogadorDao
 ) {
     fun listarJogadores(): Flow<Result<List<JogadorEntity>>> =
-        jogadorDao.listartodos()
-            .map { lista -> Result.success(lista) as Result<List<JogadorEntity>> }
-            .catch { e ->
-                emit(Result.failure(e))
-            }
+        jogadorDao.listarTodos()
+            .map { lista -> Result.success(lista) }
+            .catch { e -> emit(Result.failure(e)) }
+
+    suspend fun buscarPorNome(nome: String): Result<JogadorEntity?> {
+        return try {
+            Result.success(jogadorDao.buscaPorNome(nome))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 
     suspend fun inserirJogador(jogador: JogadorEntity): Result<Long> {
         return try {
@@ -24,6 +30,7 @@ class JogadorRepository(
             Result.failure(e)
         }
     }
+
     suspend fun atualizarJogador(jogador: JogadorEntity): Result<Unit> {
         return try {
             jogadorDao.atualizar(jogador)
@@ -32,6 +39,7 @@ class JogadorRepository(
             Result.failure(e)
         }
     }
+
     suspend fun deletarJogador(jogador: JogadorEntity): Result<Unit> {
         return try {
             jogadorDao.deletar(jogador)

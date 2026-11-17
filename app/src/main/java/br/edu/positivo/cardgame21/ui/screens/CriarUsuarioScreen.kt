@@ -19,17 +19,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import br.edu.positivo.cardgame21.ui.components.BarraTopo
 import br.edu.positivo.cardgame21.ui.components.BotaoPrincipal
+import br.edu.positivo.cardgame21.ui.components.CaixaErro
 import br.edu.positivo.cardgame21.ui.components.CampoTexto
 import br.edu.positivo.cardgame21.ui.theme.*
 
 @Composable
 fun CriarUsuarioScreen(
     onVoltar: () -> Unit,
-    onSalvarUsuario: (nome: String, isAdmin: Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    onSalvarUsuario: (nome: String, senha: String, isAdmin: Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    mensagemErro: String? = null
 ) {
     var nome by rememberSaveable { mutableStateOf("") }
+    var senha by rememberSaveable { mutableStateOf("") }
     var isAdmin by rememberSaveable { mutableStateOf(false) }
+    var erroLocal by rememberSaveable { mutableStateOf<String?>(null) }
 
     Column(
         modifier = modifier
@@ -69,6 +73,14 @@ fun CriarUsuarioScreen(
                 placeholder = "ex.: jogador21"
             )
 
+            CampoTexto(
+                rotulo = "Senha",
+                valor = senha,
+                onValorChange = { senha = it },
+                placeholder = "••••••",
+                senha = true
+            )
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -86,11 +98,21 @@ fun CriarUsuarioScreen(
             }
         }
 
+        val erro = erroLocal ?: mensagemErro
+        if (erro != null) CaixaErro(erro)
+
         Spacer(modifier = Modifier.weight(1f))
 
         BotaoPrincipal(
             texto = "SALVAR PERFIL",
-            onClick = { if (nome.isNotBlank()) onSalvarUsuario(nome, isAdmin) },
+            onClick = {
+                if (nome.isBlank() || senha.isBlank()) {
+                    erroLocal = "Preencha o nome e a senha"
+                } else {
+                    erroLocal = null
+                    onSalvarUsuario(nome.trim(), senha, isAdmin)
+                }
+            },
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -100,6 +122,6 @@ fun CriarUsuarioScreen(
 @Composable
 private fun CriarUsuarioScreenPreview() {
     Jogo21Theme {
-        CriarUsuarioScreen(onVoltar = {}, onSalvarUsuario = { _, _ -> })
+        CriarUsuarioScreen(onVoltar = {}, onSalvarUsuario = { _, _, _ -> })
     }
 }

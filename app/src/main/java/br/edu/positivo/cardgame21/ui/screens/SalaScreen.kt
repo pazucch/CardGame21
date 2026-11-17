@@ -59,7 +59,8 @@ fun SalaScreen(
     modifier: Modifier = Modifier,
     onCriarMesa: () -> Unit = {},
     onEntrarComCodigo: (String) -> Unit = {},
-    onCompartilhar: () -> Unit = {}
+    onCompartilhar: () -> Unit = {},
+    nomeUsuario: String = "Convidado"
 ) {
     var codigo by rememberSaveable { mutableStateOf("") }
 
@@ -76,7 +77,7 @@ fun SalaScreen(
             titulo = "Sala",
             descricaoVoltar = "Voltar ao login",
             onVoltar = onVoltar
-        ) { Pilula("jogador21") }
+        ) { Pilula(nomeUsuario) }
 
         BotaoPrincipal("CRIAR MESA", onCriarMesa, Modifier.fillMaxWidth())
 

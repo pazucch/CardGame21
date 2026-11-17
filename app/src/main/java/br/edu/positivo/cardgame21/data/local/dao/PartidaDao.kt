@@ -10,8 +10,7 @@ import br.edu.positivo.cardgame21.data.local.entity.PartidaEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface PartidaDao
-{
+interface PartidaDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun inserir(partida: PartidaEntity): Long
 

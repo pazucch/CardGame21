@@ -11,10 +11,10 @@ import br.edu.positivo.cardgame21.data.local.entity.PartidaEntity
 
 @Database(
     entities = [JogadorEntity::class, PartidaEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
-abstract class AppDatabase: RoomDatabase() {
+abstract class AppDatabase : RoomDatabase() {
     abstract fun jogadorDao(): JogadorDao
     abstract fun partidaDao(): PartidaDao
 
@@ -28,11 +28,12 @@ abstract class AppDatabase: RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "cardgame_database"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration(true)
+                    .build()
                 INSTANCE = instance
                 instance
             }
         }
     }
-
 }

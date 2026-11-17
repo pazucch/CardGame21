@@ -17,6 +17,25 @@ interface PartidaDao {
     @Query("SELECT * FROM partidas ORDER BY pontos DESC")
     fun listarPlacar(): Flow<List<PartidaEntity>>
 
+    @Query("""
+    SELECT * FROM partidas
+    WHERE jogadorId = :jogadorId
+    ORDER BY dataPartida DESC
+    """)
+    fun listarPorJogador(
+        jogadorId: Long
+    ): Flow<List<PartidaEntity>>
+
+
+    @Query("""
+    SELECT * FROM partidas
+    WHERE id = :id
+    LIMIT 1
+""")
+    suspend fun buscarPorId(
+        id: Long
+    ): PartidaEntity?
+
     @Update
     suspend fun atualizar(partida: PartidaEntity)
 

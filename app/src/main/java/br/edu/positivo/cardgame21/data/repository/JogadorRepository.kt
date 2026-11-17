@@ -22,6 +22,17 @@ class JogadorRepository(
         }
     }
 
+    fun pesquisarJogadores(
+        nome: String
+    ): Flow<Result<List<JogadorEntity>>> =
+        jogadorDao.pesquisarPorNome(nome)
+            .map { lista ->
+                Result.success(lista)
+            }
+            .catch { erro ->
+                emit(Result.failure(erro))
+            }
+
     suspend fun inserirJogador(jogador: JogadorEntity): Result<Long> {
         return try {
             val id = jogadorDao.inserir(jogador)

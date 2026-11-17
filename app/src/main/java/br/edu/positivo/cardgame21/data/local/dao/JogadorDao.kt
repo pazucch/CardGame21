@@ -29,4 +29,11 @@ interface JogadorDao {
 
     @Query("SELECT * FROM jogadores WHERE nome = :nome LIMIT 1")
     suspend fun buscaPorNome(nome: String): JogadorEntity?
+
+    @Query("""
+    SELECT * FROM jogadores
+    WHERE nome LIKE '%' || :nome || '%'
+    ORDER BY nome ASC
+""")
+    fun pesquisarPorNome(nome: String): Flow<List<JogadorEntity>>
 }

@@ -14,6 +14,29 @@ class PartidaRepository(
             .map { lista -> Result.success(lista) }
             .catch { e -> emit(Result.failure(e)) }
 
+    fun listarPartidasPorJogador(
+        jogadorId: Long
+    ): Flow<Result<List<PartidaEntity>>> =
+        partidaDao.listarPorJogador(jogadorId)
+            .map { partidas ->
+                Result.success(partidas)
+            }
+            .catch { erro ->
+                emit(Result.failure(erro))
+            }
+
+    suspend fun buscarPartidaPorId(
+        id: Long
+    ): Result<PartidaEntity?> {
+        return try {
+            Result.success(
+                partidaDao.buscarPorId(id)
+            )
+        } catch (erro: Exception) {
+            Result.failure(erro)
+        }
+    }
+
     suspend fun inserirPartida(partida: PartidaEntity): Result<Long> {
         return try {
             val id = partidaDao.inserir(partida)

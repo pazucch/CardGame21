@@ -4,6 +4,7 @@ import android.content.Context
 import br.edu.positivo.cardgame21.data.local.database.AppDatabase
 import br.edu.positivo.cardgame21.data.repository.JogadorRepository
 import br.edu.positivo.cardgame21.data.repository.PartidaRepository
+import br.edu.positivo.cardgame21.ui.viewmodel.GameViewModel
 
 class AppContainer(context: Context) {
 
@@ -19,6 +20,10 @@ class AppContainer(context: Context) {
         database.partidaDao()
     )
 
-    val viewModelFactory = ViewModelFactory()
+    val viewModelFactory = ViewModelFactory().apply {
+        register(GameViewModel::class.java) {
+            GameViewModel()
+        }
+    }
 
 }

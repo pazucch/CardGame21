@@ -110,7 +110,7 @@ fun AppNavigation() {
             }
 
             composable(Rotas.JOGO) {
-                JogoScreen(
+                JogoRoute(
                     onSair = { navController.popBackStack() }
                 )
             }

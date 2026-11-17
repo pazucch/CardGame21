@@ -1,5 +1,6 @@
 package br.edu.positivo.cardgame21.ui.screens
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -84,7 +85,10 @@ fun JogoScreen(
     mensagemStatus: String = "Sua vez",
     dicaStatus: String = "Chegue o mais perto de 21 sem passar",
     onAumentarAposta: () -> Unit = {},
-    onDiminuirAposta: () -> Unit = {}
+    onDiminuirAposta: () -> Unit = {},
+    podeJogar: Boolean = true,
+    rodadaEncerrada: Boolean = false,
+    onNovaRodada: () -> Unit = {}
 ) {
     Column(
         modifier = modifier
@@ -111,7 +115,7 @@ fun JogoScreen(
                 Text("Pontos: $pontosBanca", color = CremeTexto, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
             }
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
@@ -202,11 +206,11 @@ fun JogoScreen(
                 Text("VOCÊ · $nomeJogador", color = Dourado, fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
                 Text("Pontos: $pontosVoce", color = CremeTexto, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(modifier = Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 cartasVoce.forEach { (valor, naipe) ->
                     CartaFrente(valor, naipe)
                 }
-                CartaVazia("próxima carta")
+                if (podeJogar) CartaVazia("próxima carta")
             }
         }
 
@@ -246,15 +250,20 @@ fun JogoScreen(
                 onClick = onPedirCarta,
                 modifier = Modifier.weight(1f),
                 altura = Dimens.AlturaBotaoJogo,
-                tamanhoTexto = 15.sp
+                tamanhoTexto = 15.sp,
+                enabled = podeJogar
             )
             BotaoSecundario(
                 texto = "PARAR",
                 onClick = onParar,
                 modifier = Modifier.weight(1f),
                 altura = Dimens.AlturaBotaoJogo,
-                tamanhoTexto = 15.sp
+                tamanhoTexto = 15.sp,
+                enabled = podeJogar
             )
+        }
+        if (rodadaEncerrada) {
+            BotaoPrincipal("NOVA RODADA", onNovaRodada, Modifier.fillMaxWidth())
         }
     }
 }

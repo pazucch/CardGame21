@@ -6,13 +6,56 @@ import br.edu.positivo.cardgame21.logic.Carta
 import br.edu.positivo.cardgame21.logic.FonteCartas
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.util.UUID
 
 class GameViewModel(private val baralho: FonteCartas = Baralho()) : ViewModel() {
     private val _uiState = MutableStateFlow(GameUiState())
     val uiState = _uiState.asStateFlow()
 
-    init {
+    fun definirJogador(nome: String) {
+        _uiState.value = GameUiState(nomeJogador = nome.trim().ifBlank { "Convidado" })
+    }
+
+    fun criarMesa(aposta: Int): Boolean {
+        if (_uiState.value.fase == FaseRodada.JOGADOR || _uiState.value.fase == FaseRodada.BANCA) return false
+        if (aposta < 10 || aposta % 10 != 0) return false
+        _uiState.value = GameUiState(
+            codigoMesa = UUID.randomUUID().toString().take(8).uppercase(),
+            nomeJogador = _uiState.value.nomeJogador,
+            aposta = aposta
+        )
+        return true
+    }
+
+    fun iniciarPartida(): Boolean {
+        if (!_uiState.value.podeIniciar) return false
         distribuirRodada()
+        return true
+    }
+
+    fun aumentarAposta() {
+        val estado = _uiState.value
+        if (estado.podeAlterarAposta && estado.aposta <= Int.MAX_VALUE - 10) {
+            _uiState.value = estado.copy(aposta = estado.aposta + 10)
+        }
+    }
+
+    fun diminuirAposta() {
+        val estado = _uiState.value
+        if (estado.podeAlterarAposta && estado.aposta > 10) {
+            _uiState.value = estado.copy(aposta = estado.aposta - 10)
+        }
+    }
+
+    fun sairDaPartida() {
+        val estado = _uiState.value
+        _uiState.value = GameUiState(
+            codigoMesa = estado.codigoMesa, nomeJogador = estado.nomeJogador, aposta = estado.aposta
+        )
+    }
+
+    fun fecharMesa() {
+        _uiState.value = GameUiState(nomeJogador = _uiState.value.nomeJogador)
     }
 
     fun novaRodada() {
@@ -22,7 +65,11 @@ class GameViewModel(private val baralho: FonteCartas = Baralho()) : ViewModel() 
 
     private fun distribuirRodada() {
         baralho.reiniciar()
-        _uiState.value = GameUiState(aposta = _uiState.value.aposta)
+        val anterior = _uiState.value
+        _uiState.value = GameUiState(
+            codigoMesa = anterior.codigoMesa, nomeJogador = anterior.nomeJogador,
+            aposta = anterior.aposta, fase = FaseRodada.JOGADOR
+        )
         val jogador = mutableListOf<Carta>()
         val banca = mutableListOf<Carta>()
         repeat(2) {

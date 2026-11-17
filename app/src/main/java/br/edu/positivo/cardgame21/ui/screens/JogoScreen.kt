@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -88,7 +89,8 @@ fun JogoScreen(
     onDiminuirAposta: () -> Unit = {},
     podeJogar: Boolean = true,
     rodadaEncerrada: Boolean = false,
-    onNovaRodada: () -> Unit = {}
+    onNovaRodada: () -> Unit = {},
+    podeAlterarAposta: Boolean = false
 ) {
     Column(
         modifier = modifier
@@ -225,7 +227,7 @@ fun JogoScreen(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                BotaoQuadrado("−", "Diminuir aposta", onDiminuirAposta)
+                BotaoQuadrado("−", "Diminuir aposta", onDiminuirAposta, podeAlterarAposta && apostaAtual > 10)
                 Box(
                     modifier = Modifier
                         .size(52.dp)
@@ -236,7 +238,7 @@ fun JogoScreen(
                 ) {
                     Text(apostaAtual.toString(), color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.Bold)
                 }
-                BotaoQuadrado("+", "Aumentar aposta", onAumentarAposta)
+                BotaoQuadrado("+", "Aumentar aposta", onAumentarAposta, podeAlterarAposta && apostaAtual <= Int.MAX_VALUE - 10)
             }
         }
 
@@ -295,15 +297,16 @@ private fun JogadorNaMesa(
 }
 
 @Composable
-private fun BotaoQuadrado(simbolo: String, descricao: String, onClick: () -> Unit) {
+private fun BotaoQuadrado(simbolo: String, descricao: String, onClick: () -> Unit, enabled: Boolean = true) {
     val forma = RoundedCornerShape(10.dp)
     Box(
         modifier = Modifier
             .size(44.dp)
+            .alpha(if (enabled) 1f else 0.4f)
             .clip(forma)
             .background(VerdePainel)
             .border(2.dp, VerdeBorda, forma)
-            .clickable(role = Role.Button, onClick = onClick)
+            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
             .semantics { contentDescription = descricao },
         contentAlignment = Alignment.Center
     ) {

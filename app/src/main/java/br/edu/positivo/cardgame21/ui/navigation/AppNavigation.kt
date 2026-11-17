@@ -11,6 +11,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import br.edu.positivo.cardgame21.CardGameApplication
+import br.edu.positivo.cardgame21.ui.viewmodel.GameViewModel
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
@@ -54,6 +59,10 @@ private fun NavHostController.sairDaConta() {
 
 @Composable
 fun AppNavigation() {
+    // A mesma instância mantém a mesa entre Sala, Criar Mesa e Jogo.
+    val application = LocalContext.current.applicationContext as CardGameApplication
+    val gameViewModel: GameViewModel = viewModel(factory = application.container.viewModelFactory)
+    val jogo by gameViewModel.uiState.collectAsState()
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
@@ -81,9 +90,15 @@ fun AppNavigation() {
         ) {
             composable(Rotas.LOGIN) {
                 LoginScreen(
-                    onEntrar = { _, _ -> navController.entrarNaSala() },
+                    onEntrar = { nome, _ ->
+                        gameViewModel.definirJogador(nome)
+                        navController.entrarNaSala()
+                    },
                     onCriarConta = { navController.navigate(Rotas.CRIAR_USUARIO) },
-                    onConvidado = { navController.entrarNaSala() }
+                    onConvidado = {
+                        gameViewModel.definirJogador("Convidado")
+                        navController.entrarNaSala()
+                    }
                 )
             }
 
@@ -96,21 +111,38 @@ fun AppNavigation() {
 
             composable(Rotas.SALA) {
                 SalaScreen(
-                    onVoltar = { navController.sairDaConta() },
-                    onIniciarPartida = { navController.navigate(Rotas.JOGO) },
-                    onCriarMesa = { navController.navigate(Rotas.CRIAR_MESA) }
+                    onVoltar = {
+                        gameViewModel.fecharMesa()
+                        navController.sairDaConta()
+                    },
+                    onIniciarPartida = {
+                        if (gameViewModel.iniciarPartida()) navController.navigate(Rotas.JOGO)
+                    },
+                    onCriarMesa = { navController.navigate(Rotas.CRIAR_MESA) },
+                    nomeUsuario = jogo.nomeJogador,
+                    jogadores = if (jogo.temMesa) listOf(jogo.nomeJogador) else emptyList(),
+                    codigoMesa = jogo.codigoMesa,
+                    modoLocal = true,
+                    podeIniciar = jogo.podeIniciar,
+                    aposta = jogo.aposta,
+                    onAumentarAposta = gameViewModel::aumentarAposta,
+                    onDiminuirAposta = gameViewModel::diminuirAposta,
+                    onFecharMesa = gameViewModel::fecharMesa
                 )
             }
 
             composable(Rotas.CRIAR_MESA) {
                 CriarMesaScreen(
                     onVoltar = { navController.popBackStack() },
-                    onCriarMesa = { _ -> navController.popBackStack() }
+                    onCriarMesa = { aposta ->
+                        if (gameViewModel.criarMesa(aposta)) navController.popBackStack()
+                    }
                 )
             }
 
             composable(Rotas.JOGO) {
                 JogoRoute(
+                    gameViewModel = gameViewModel,
                     onSair = { navController.popBackStack() }
                 )
             }

@@ -13,6 +13,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -64,7 +65,7 @@ fun CriarMesaScreen(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                BotaoQuadradoCriarMesa("-") { if (aposta > 10) aposta -= 10 }
+                BotaoQuadradoCriarMesa("-", enabled = aposta > 10) { aposta -= 10 }
                 Spacer(modifier = Modifier.width(20.dp))
                 Box(
                     modifier = Modifier
@@ -76,7 +77,7 @@ fun CriarMesaScreen(
                     Text("$aposta", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 }
                 Spacer(modifier = Modifier.width(20.dp))
-                BotaoQuadradoCriarMesa("+") { aposta += 10 }
+                BotaoQuadradoCriarMesa("+", enabled = aposta <= Int.MAX_VALUE - 10) { aposta += 10 }
             }
         }
 
@@ -91,13 +92,14 @@ fun CriarMesaScreen(
 }
 
 @Composable
-private fun BotaoQuadradoCriarMesa(simbolo: String, onClick: () -> Unit) {
+private fun BotaoQuadradoCriarMesa(simbolo: String, enabled: Boolean = true, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .size(48.dp)
+            .alpha(if (enabled) 1f else 0.4f)
             .clip(RoundedCornerShape(8.dp))
             .background(VerdeMesa)
-            .clickable { onClick() },
+            .clickable(enabled = enabled) { onClick() },
         contentAlignment = Alignment.Center
     ) {
         Text(simbolo, color = CremeTexto, fontSize = 24.sp)

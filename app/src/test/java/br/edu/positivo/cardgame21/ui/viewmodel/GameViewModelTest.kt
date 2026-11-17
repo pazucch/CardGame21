@@ -18,7 +18,10 @@ class GameViewModelTest {
             override fun reiniciar() { indice = 0 }
             override fun comprarCarta(): Carta? = cartas.getOrNull(indice)?.also { indice++ }
             override fun cartasRestantes(): Int = cartas.size - indice
-        })
+        }).also {
+            it.criarMesa(50)
+            it.iniciarPartida()
+        }
     }
 
     @Test fun distribuiDuasCartasPorMao() {
@@ -112,7 +115,10 @@ class GameViewModelTest {
     }
 
     @Test fun baralhoLocalComecaComQuarentaEOitoCartasRestantes() {
-        val estado = GameViewModel().uiState.value
+        val vm = GameViewModel()
+        vm.criarMesa(50)
+        vm.iniciarPartida()
+        val estado = vm.uiState.value
         // Se vier 21 inicial, a banca pode já ter comprado cartas.
         assertTrue(estado.cartasRestantes <= 48)
         assertEquals(2, estado.cartasJogador.size)

@@ -22,11 +22,11 @@ class CartaRepository(
         private set
 
     suspend fun iniciarBaralho(): FonteCartas {
-        cartas.clear()
+        var novasCartas: List<Carta>
+        var novaFonte: FonteCartas
 
         try {
             val deck = api.criarBaralho()
-
             check(deck.success)
 
             val resposta = api.comprarCartas(
@@ -43,23 +43,29 @@ class CartaRepository(
             check(recebidas.size == 52)
             check(recebidas.distinct().size == 52)
 
-            cartas.addAll(recebidas)
-            fonteAtual = FonteCartas.REMOTA
+            novasCartas = recebidas
+            novaFonte = FonteCartas.REMOTA
 
         } catch (erro: CancellationException) {
             throw erro
 
         } catch (erro: Exception) {
             val baralhoLocal = Baralho()
+            val locais = mutableListOf<Carta>()
 
             repeat(52) {
                 baralhoLocal.comprarCarta()?.let {
-                    cartas.add(it)
+                    locais.add(it)
                 }
             }
 
-            fonteAtual = FonteCartas.LOCAL
+            novasCartas = locais
+            novaFonte = FonteCartas.LOCAL
         }
+
+        cartas.clear()
+        cartas.addAll(novasCartas)
+        fonteAtual = novaFonte
 
         return fonteAtual
     }

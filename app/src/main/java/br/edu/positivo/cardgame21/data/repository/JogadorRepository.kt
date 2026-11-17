@@ -9,6 +9,26 @@ import kotlinx.coroutines.flow.map
 class JogadorRepository(
     private val jogadorDao: JogadorDao
 ) {
+    suspend fun criarAdminInicial(
+        nome: String,
+        senhaHash: String
+    ): Result<Boolean> {
+        return try {
+            val criado = jogadorDao.inserirAdminInicial(
+                nome = nome,
+                senhaHash = senhaHash
+            )
+
+            Result.success(criado)
+
+        } catch (erro: kotlinx.coroutines.CancellationException) {
+            throw erro
+
+        } catch (erro: Exception) {
+            Result.failure(erro)
+        }
+    }
+
     fun listarJogadores(): Flow<Result<List<JogadorEntity>>> =
         jogadorDao.listarTodos()
             .map { lista -> Result.success(lista) }

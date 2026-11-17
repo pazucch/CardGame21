@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import androidx.room.Transaction
 import br.edu.positivo.cardgame21.data.local.entity.JogadorEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -36,4 +37,39 @@ interface JogadorDao {
     ORDER BY nome ASC
 """)
     fun pesquisarPorNome(nome: String): Flow<List<JogadorEntity>>
+    
+    @Query("""
+    SELECT COUNT(*) FROM jogadores
+    WHERE isAdmin = 1
+""")
+    suspend fun contarAdministradores(): Int
+
+    @Transaction
+    suspend fun inserirAdminInicial(
+        nome: String,
+        senhaHash: String
+    ): Boolean {
+
+        if (contarAdministradores() > 0) {
+            return false
+        }
+
+        require(nome.isNotBlank()) {
+            "Nome do administrador obrigatório"
+        }
+
+        require(senhaHash.isNotBlank()) {
+            "Hash da senha obrigatório"
+        }
+
+        val administrador = JogadorEntity(
+            nome = nome,
+            senhaHash = senhaHash,
+            isAdmin = true
+        )
+
+        inserir(administrador)
+
+        return true
+    }
 }

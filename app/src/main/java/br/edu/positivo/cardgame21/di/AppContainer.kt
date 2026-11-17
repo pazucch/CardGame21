@@ -12,7 +12,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 class AppContainer(context: Context) {
 
     // Instância compartilhada do banco de dados
-    private val database = AppDatabase.getDatabase(context)
+    val database = AppDatabase.getDatabase(context)
 
     // Repositories utilizados pelos ViewModels
     val jogadorRepository = JogadorRepository(

@@ -8,7 +8,6 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class GameViewModelTest {
-    // Ordem: jogador, banca, jogador, banca, próximas compras.
     private fun jogo(vararg valores: Int): GameViewModel {
         val cartas = valores.map { pontos ->
             Carta(Naipe.COPAS, ValorCarta.entries.first { it.pontos == pontos })
@@ -101,17 +100,14 @@ class GameViewModelTest {
         val vm = jogo(10, 10, 8, 7, 5)
         val inicial = vm.uiState.value
 
-        // Não deve iniciar outra rodada enquanto a atual estiver em andamento.
         vm.novaRodada()
         assertEquals(inicial, vm.uiState.value)
 
-        // Jogador ultrapassa 21 e perde a aposta.
         vm.pedirCarta()
 
         val saldoAposDerrota = vm.uiState.value.saldo
         assertEquals(inicial.saldo - inicial.aposta, saldoAposDerrota)
 
-        // Nova rodada deve restaurar as cartas, mas preservar o saldo.
         vm.novaRodada()
 
         val novaRodada = vm.uiState.value
@@ -135,7 +131,6 @@ class GameViewModelTest {
         vm.criarMesa(50)
         vm.iniciarPartida()
         val estado = vm.uiState.value
-        // Se vier 21 inicial, a banca pode já ter comprado cartas.
         assertTrue(estado.cartasRestantes <= 48)
         assertEquals(2, estado.cartasJogador.size)
     }

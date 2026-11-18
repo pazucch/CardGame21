@@ -9,7 +9,6 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-// Borda tracejada com cantos arredondados (o Compose não traz uma pronta).
 fun Modifier.bordaTracejada(cor: Color, raio: Dp = 8.dp, espessura: Dp = 2.dp): Modifier =
     this.drawBehind {
         drawRoundRect(

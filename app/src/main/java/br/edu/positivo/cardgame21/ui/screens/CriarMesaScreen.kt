@@ -46,7 +46,6 @@ fun CriarMesaScreen(
             onVoltar = onVoltar
         ) {}
 
-        // Painel de configuração
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -59,7 +58,6 @@ fun CriarMesaScreen(
 
             Text("Valor da Aposta Inicial", color = CremeTexto, fontSize = 15.sp)
 
-            // Controle de aposta
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,

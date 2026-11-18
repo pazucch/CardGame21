@@ -8,8 +8,6 @@ data class PerfilSessao(val jogador: JogadorEntity? = null, val convidado: Boole
     val autenticado: Boolean get() = jogador != null || convidado
     val isAdmin: Boolean get() = jogador?.isAdmin == true
 }
-
-// Compartilhada pelo container; logout elimina o perfil e suas permissões.
 class SessaoUsuario {
     private val _perfil = MutableStateFlow(PerfilSessao())
     val perfil = _perfil.asStateFlow()

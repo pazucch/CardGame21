@@ -67,7 +67,6 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        // Logo, nome e frase de boas-vindas
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -98,7 +97,6 @@ fun LoginScreen(
             Text("Entre para sentar à mesa", color = VerdeTextoSuave, fontSize = 15.sp)
         }
 
-        // Desenho decorativo: três cartas
         Row(
             modifier = Modifier.height(92.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -109,7 +107,6 @@ fun LoginScreen(
             CartaFrente("K", Naipe.OUROS, Modifier.rotate(10f), largura = 56.dp, altura = 80.dp)
         }
 
-        // Formulário
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(14.dp)
@@ -130,7 +127,6 @@ fun LoginScreen(
             if (mensagemErro != null) CaixaErro(mensagemErro)
         }
 
-        // Ações
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,

@@ -54,7 +54,6 @@ class AdminViewModel(
 
     fun limparMensagem() { _uiState.update { it.copy(mensagemErro = null, mensagem = null) } }
 
-    // Confere a sessão e o perfil persistido também nas operações, além da rota.
     private fun executar(acao: suspend () -> Result<Unit>) {
         if (_uiState.value.carregando) return
         _uiState.update { it.copy(carregando = true, mensagemErro = null, mensagem = null) }

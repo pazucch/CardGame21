@@ -34,7 +34,6 @@ import br.edu.positivo.cardgame21.ui.theme.Vermelho
 import br.edu.positivo.cardgame21.ui.theme.VerdeBorda
 import br.edu.positivo.cardgame21.ui.theme.VerdeTextoSuave
 
-// Carta aberta, com valor e naipe.
 @Composable
 fun CartaFrente(
     valor: String,
@@ -88,7 +87,6 @@ fun CartaFrente(
     }
 }
 
-// Carta pequena (para as mãos dos outros jogadores), com valor e naipe na mesma linha.
 @Composable
 fun CartaMini(valor: String, naipe: Naipe, modifier: Modifier = Modifier) {
     val forma = RoundedCornerShape(4.dp)
@@ -110,7 +108,6 @@ fun CartaMini(valor: String, naipe: Naipe, modifier: Modifier = Modifier) {
     }
 }
 
-// Carta virada para baixo.
 @Composable
 fun CartaCostas(
     modifier: Modifier = Modifier,
@@ -135,7 +132,6 @@ fun CartaCostas(
     }
 }
 
-// Espaço tracejado onde a próxima carta vai aparecer
 @Composable
 fun CartaVazia(
     texto: String,

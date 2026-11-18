@@ -2,7 +2,6 @@ package br.edu.positivo.cardgame21.ui.theme
 
 import androidx.compose.ui.unit.dp
 
-// Medidas que se repetem
 
 object Dimens {
     val PaddingTela = 20.dp

@@ -31,7 +31,7 @@ import br.edu.positivo.cardgame21.ui.theme.FonteTitulo
 import br.edu.positivo.cardgame21.ui.theme.VerdeBorda
 import br.edu.positivo.cardgame21.ui.theme.VerdePainel
 
-// Botão quadrado com a seta de voltar.
+
 @Composable
 fun BotaoVoltar(descricao: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val forma = RoundedCornerShape(12.dp)
@@ -52,7 +52,6 @@ fun BotaoVoltar(descricao: String, onClick: () -> Unit, modifier: Modifier = Mod
     }
 }
 
-// Etiqueta arredondada (nome do jogador, saldo de fichas...).
 @Composable
 fun Pilula(
     texto: String,
@@ -75,7 +74,6 @@ fun Pilula(
     }
 }
 
-// Ficha dourada pequena, usada ao lado do saldo.
 @Composable
 fun FichaIcone(tamanho: Dp = 18.dp) {
     Box(
@@ -87,7 +85,6 @@ fun FichaIcone(tamanho: Dp = 18.dp) {
     )
 }
 
-// Barra do topo: voltar à esquerda, título no meio e um conteúdo à direita.
 @Composable
 fun BarraTopo(
     titulo: String,

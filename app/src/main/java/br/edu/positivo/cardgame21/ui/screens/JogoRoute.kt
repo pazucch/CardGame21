@@ -18,7 +18,6 @@ import br.edu.positivo.cardgame21.ui.viewmodel.ResultadoRodada
 @Composable
 fun JogoRoute(onSair: () -> Unit, gameViewModel: GameViewModel) {
     val estado by gameViewModel.uiState.collectAsState()
-    // Após recriação do processo, não permanece numa partida sem mesa em memória.
     LaunchedEffect(estado.temMesa) {
         if (!estado.temMesa) onSair()
     }
@@ -32,7 +31,6 @@ fun JogoRoute(onSair: () -> Unit, gameViewModel: GameViewModel) {
     }
     val solicitarSaida = {
         if (estado.salvando) {
-            // Aguarda a gravação terminar antes de liberar a saída.
         } else if (estado.carregando || estado.erroSalvar != null || estado.fase == FaseRodada.JOGADOR || estado.fase == FaseRodada.BANCA) {
             confirmarSaida = true
         } else sair()

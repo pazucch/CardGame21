@@ -12,8 +12,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface JogadorDao {
-    // Sem REPLACE: nome repetido lança exceção (tratada no Repository).
-    // Com REPLACE, o jogador antigo seria apagado e suas partidas junto (CASCADE).
     @Insert
     suspend fun inserir(jogador: JogadorEntity): Long
 

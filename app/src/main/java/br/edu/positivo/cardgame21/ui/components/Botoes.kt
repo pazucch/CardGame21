@@ -23,7 +23,6 @@ import br.edu.positivo.cardgame21.ui.theme.Dourado
 import br.edu.positivo.cardgame21.ui.theme.Preto
 import br.edu.positivo.cardgame21.ui.theme.VerdeTextoSuave
 
-// Botão dourado cheio (ação principal da tela).
 @Composable
 fun BotaoPrincipal(
     texto: String,
@@ -44,7 +43,6 @@ fun BotaoPrincipal(
     }
 }
 
-// Botão só com contorno dourado (ação secundária).
 @Composable
 fun BotaoSecundario(
     texto: String,
@@ -66,7 +64,6 @@ fun BotaoSecundario(
     }
 }
 
-// Texto sublinhado clicável.
 @Composable
 fun BotaoLink(texto: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     TextButton(

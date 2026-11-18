@@ -6,8 +6,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-// Fonte com serifa usada em títulos, números e códigos
-
 val FonteTitulo = FontFamily.Serif
 
 val Typography = Typography(

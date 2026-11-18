@@ -30,7 +30,6 @@ class AuthViewModel(
             sessao.perfil.collect { perfil -> _uiState.update { it.copy(perfil = perfil) } }
         }
         viewModelScope.launch {
-            // Conta inicial da demonstração acadêmica, criada uma única vez pelo DAO.
             val resultado = repository.criarAdminInicial("admin", Seguranca.hashSenha("admin123"))
             _uiState.update { it.copy(carregando = false, mensagemErro = resultado.exceptionOrNull()?.message) }
         }
@@ -64,7 +63,6 @@ class AuthViewModel(
         if (validacao != null) { erro(validacao); return }
         _uiState.update { it.copy(carregando = true, mensagemErro = null) }
         viewModelScope.launch {
-            // O formulário público jamais determina privilégios de administrador.
             val jogador = JogadorEntity(nome = nome.trim(), senhaHash = Seguranca.hashSenha(senha))
             repository.inserirJogador(jogador).fold(
                 onSuccess = { id -> sessao.entrar(jogador.copy(id = id)) },

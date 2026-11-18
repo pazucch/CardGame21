@@ -39,7 +39,6 @@ import br.edu.positivo.cardgame21.ui.theme.ErroTexto
 import br.edu.positivo.cardgame21.ui.theme.Preto
 import br.edu.positivo.cardgame21.ui.theme.VerdeBorda
 
-// Campo de texto claro, sem rótulo. Com [senha] = true, ganha o botão "mostrar/ocultar".
 @Composable
 fun CampoEntrada(
     valor: String,
@@ -87,7 +86,6 @@ fun CampoEntrada(
     )
 }
 
-// Rótulo em cima + CampoEntrada embaixo
 @Composable
 fun CampoTexto(
     rotulo: String,
@@ -109,7 +107,6 @@ fun CampoTexto(
     }
 }
 
-// Caixa avermelhada para mensagens de erro.
 @Composable
 fun CaixaErro(texto: String, modifier: Modifier = Modifier) {
     Box(

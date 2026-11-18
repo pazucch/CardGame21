@@ -106,7 +106,7 @@ class GameViewModel(
             codigoMesa = estado.codigoMesa, nomeJogador = estado.nomeJogador,
             aposta = estado.aposta,     saldo = estado.saldo
 
-            )
+        )
     }
 
     fun fecharMesa() {
@@ -263,14 +263,16 @@ class GameViewModel(
         val id = jogadorId ?: return
         if (partidaRepository == null) return
 
-        partidaPendente = PartidaEntity(
-            id = (UUID.randomUUID().mostSignificantBits and Long.MAX_VALUE)
-                .coerceAtLeast(1),
-            jogadorId = id,
-            pontos = if (estado.pontosJogador > 21) 0 else estado.pontosJogador
-        )
+        if (resultado == ResultadoRodada.VITORIA) {
+            partidaPendente = PartidaEntity(
+                id = (UUID.randomUUID().mostSignificantBits and Long.MAX_VALUE)
+                    .coerceAtLeast(1),
+                jogadorId = id,
+                pontos = if (estado.pontosJogador > 21) 0 else estado.pontosJogador
+            )
 
-        salvarPartida()
+            salvarPartida()
+        }
     }
 
     private fun quantidadeRestante(): Int =

@@ -7,19 +7,25 @@ const val NOME_JOGADOR_REMOVIDO = "Jogador removido"
 
 fun montarRanking(
     partidas: List<PartidaEntity>,
-    jogadores: List<JogadorEntity>
+    jogadores: List<JogadorEntity>,
+    ehVitoria: (PartidaEntity) -> Boolean = { true }
 ): List<PlacarItem> {
     val nomesPorId = jogadores.associate { it.id to it.nome }
 
     return partidas
-        .map { partida ->
+        .filter(ehVitoria)
+        .groupBy { it.jogadorId }
+        .mapNotNull { (jogadorId, partidasDoJogador) ->
+            val ultimaPartida = partidasDoJogador.maxByOrNull { it.dataPartida } ?: return@mapNotNull null
+            val totalVitorias = partidasDoJogador.size
+
             PlacarItem(
                 posicao = 0,
-                partidaId = partida.id,
-                jogadorId = partida.jogadorId,
-                nome = nomesPorId[partida.jogadorId] ?: NOME_JOGADOR_REMOVIDO,
-                pontos = partida.pontos,
-                dataPartida = partida.dataPartida
+                partidaId = ultimaPartida.id,
+                jogadorId = jogadorId,
+                nome = nomesPorId[jogadorId] ?: NOME_JOGADOR_REMOVIDO,
+                pontos = totalVitorias,
+                dataPartida = ultimaPartida.dataPartida
             )
         }
         .sortedBy { it.dataPartida }

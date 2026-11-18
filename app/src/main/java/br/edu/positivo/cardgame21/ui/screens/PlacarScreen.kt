@@ -163,7 +163,7 @@ fun PlacarScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Nenhuma partida encontrada para o filtro atual.",
+                        text = "Nenhum jogador encontrado para o filtro atual.",
                         color = VerdeTextoSuave,
                         fontSize = 15.sp
                     )
@@ -199,9 +199,9 @@ private fun ResumoMetricasPlacar(metricas: PlacarMetricas) {
             .padding(horizontal = 12.dp, vertical = 10.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        MetricaColuna(rotulo = "Partidas", valor = metricas.totalPartidas.toString())
+        MetricaColuna(rotulo = "Vitórias", valor = metricas.totalPartidas.toString())
         MetricaColuna(rotulo = "Jogadores", valor = metricas.jogadoresDistintos.toString())
-        MetricaColuna(rotulo = "Recorde", valor = "${metricas.melhorPontuacao} pts")
+        MetricaColuna(rotulo = "Mais vitórias", valor = metricas.melhorPontuacao.toString())
         MetricaColuna(rotulo = "Média", valor = mediaFormatada)
     }
 }
@@ -264,7 +264,7 @@ private fun CardPlacar(
             )
         }
         Text(
-            text = "${item.pontos} pts",
+            text = "${item.pontos} ${if (item.pontos == 1) "vitória" else "vitórias"}",
             color = Dourado,
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold

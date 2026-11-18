@@ -30,9 +30,9 @@ class PlacarMapperTest {
             jogadores = listOf(maria, joao)
         )
 
-        assertEquals(listOf(21, 18, 15), ranking.map { it.pontos })
-        assertEquals(listOf(1, 2, 3), ranking.map { it.posicao })
-        assertEquals(listOf("joão", "maria", "maria"), ranking.map { it.nome })
+        assertEquals(listOf(2, 1), ranking.map { it.pontos })
+        assertEquals(listOf(1, 2), ranking.map { it.posicao })
+        assertEquals(listOf("maria", "joão"), ranking.map { it.nome })
     }
 
     @Test

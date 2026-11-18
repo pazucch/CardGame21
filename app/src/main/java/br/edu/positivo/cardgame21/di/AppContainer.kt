@@ -6,6 +6,7 @@ import br.edu.positivo.cardgame21.data.repository.JogadorRepository
 import br.edu.positivo.cardgame21.data.repository.PartidaRepository
 import br.edu.positivo.cardgame21.data.remote.api.DeckOfCardsApi
 import br.edu.positivo.cardgame21.data.repository.CartaRepository
+import br.edu.positivo.cardgame21.ui.viewmodel.PlacarViewModel
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -23,7 +24,15 @@ class AppContainer(context: Context) {
         database.partidaDao()
     )
 
-    val viewModelFactory = ViewModelFactory()
+    // Cada ViewModel é registrado aqui; as telas o obtêm via viewModel(factory = ...).
+    val viewModelFactory = ViewModelFactory().apply {
+        register(PlacarViewModel::class.java) {
+            PlacarViewModel(
+                partidaRepository = partidaRepository,
+                jogadorRepository = jogadorRepository
+            )
+        }
+    }
 
     private val retrofit = Retrofit.Builder()
         .baseUrl("https://deckofcardsapi.com/api/")

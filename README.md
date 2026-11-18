@@ -1,43 +1,27 @@
-
 # CardGame21
 
-Projeto de um jogo de cartas baseado no Blackjack 21, desenvolvido para Android utilizando Kotlin e Jetpack Compose.
+[Português](#português) | [English](#english)
 
-Atualmente, estamos trabalhando na estrutura inicial do aplicativo, desenvolvendo as telas, componentes e navegação entre as funcionalidades.
+## Português
 
-## Tecnologias utilizadas
+Jogo de Blackjack 21 para Android, desenvolvido como projeto acadêmico na Universidade Positivo.
 
-- Kotlin
-- Jetpack Compose
-- Material Design 3
-- Android Studio
+Crie uma mesa local, escolha a aposta e jogue contra a banca. É possível criar uma conta ou jogar como convidado. As vitórias dos jogadores cadastrados ficam no ranking, que tem busca por nome e filtro por período. O perfil de administrador permite editar e excluir jogadores e partidas.
 
-## Sobre o projeto
+O app usa Kotlin, Jetpack Compose e Room. As cartas vêm da Deck of Cards API via Retrofit, com um baralho local disponível quando a API falha.
 
-A ideia é desenvolver um jogo de 21 em que os jogadores possam participar de partidas através de salas.
+Para rodar, abra o projeto no Android Studio, sincronize o Gradle e execute o módulo `app` em um emulador ou dispositivo Android.
 
-O projeto ainda está em desenvolvimento. Entre as próximas etapas estão:
+## English
 
-- Implementação das regras e mecânicas do jogo.
-- Sistema de criação e entrada em salas.
-- Partidas multiplayer em tempo real.
-- Integração com Firebase para sincronização das partidas entre os jogadores.
+An Android Blackjack 21 game built as a class project at Universidade Positivo.
 
-## Estrutura
+Create a local table, choose a bet, and play against the dealer. You can create an account or play as a guest. Wins from registered players appear on the leaderboard, which you can search by name and filter by date range. Admins can edit and delete players and game records.
 
-O projeto está organizado em três partes principais:
+The app uses Kotlin, Jetpack Compose, and Room. It gets cards from the Deck of Cards API through Retrofit and uses a local deck if the API request fails.
 
-- `navigation`: gerenciamento da navegação entre telas.
-- `ui/components`: componentes reutilizáveis da interface.
-- `ui/screens`: telas do aplicativo.
-- `ui/theme`: cores, tipografia e configurações visuais.
+To run it, open the project in Android Studio, sync Gradle, and run the `app` module on an Android emulator or device.
 
-## Identificação
+## Licença / License
 
-- **Package:** `br.edu.positivo.cardgame21`
-- **Plataforma:** Android
-- **Linguagem:** Kotlin
-
----
-
-Projeto acadêmico desenvolvido na Universidade Positivo, licença MIT.
+[MIT](LICENSE.md)

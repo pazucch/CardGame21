@@ -5,12 +5,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
@@ -28,11 +25,12 @@ fun CriarUsuarioScreen(
     onVoltar: () -> Unit,
     onSalvarUsuario: (nome: String, senha: String, isAdmin: Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    mensagemErro: String? = null
+    mensagemErro: String? = null,
+    carregando: Boolean = false
 ) {
     var nome by rememberSaveable { mutableStateOf("") }
     var senha by rememberSaveable { mutableStateOf("") }
-    var isAdmin by rememberSaveable { mutableStateOf(false) }
+
     var erroLocal by rememberSaveable { mutableStateOf<String?>(null) }
 
     Column(
@@ -81,21 +79,7 @@ fun CriarUsuarioScreen(
                 senha = true
             )
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text("Criar como Administrador?", color = CremeTexto, fontSize = 14.sp)
-                Switch(
-                    checked = isAdmin,
-                    onCheckedChange = { isAdmin = it },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = Dourado,
-                        checkedTrackColor = VerdeMesa
-                    )
-                )
-            }
+
         }
 
         val erro = erroLocal ?: mensagemErro
@@ -104,13 +88,14 @@ fun CriarUsuarioScreen(
         Spacer(modifier = Modifier.weight(1f))
 
         BotaoPrincipal(
-            texto = "SALVAR PERFIL",
+            texto = if (carregando) "SALVANDO..." else "SALVAR PERFIL",
             onClick = {
+                if (carregando) return@BotaoPrincipal
                 if (nome.isBlank() || senha.isBlank()) {
                     erroLocal = "Preencha o nome e a senha"
                 } else {
                     erroLocal = null
-                    onSalvarUsuario(nome.trim(), senha, isAdmin)
+                    onSalvarUsuario(nome.trim(), senha, false)
                 }
             },
             modifier = Modifier.fillMaxWidth()

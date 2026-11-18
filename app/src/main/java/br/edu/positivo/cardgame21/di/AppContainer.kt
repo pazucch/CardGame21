@@ -1,6 +1,9 @@
 package br.edu.positivo.cardgame21.di
 
 import android.content.Context
+import br.edu.positivo.cardgame21.data.session.SessaoUsuario
+import br.edu.positivo.cardgame21.ui.viewmodel.AuthViewModel
+import br.edu.positivo.cardgame21.ui.viewmodel.AdminViewModel
 import br.edu.positivo.cardgame21.data.local.database.AppDatabase
 import br.edu.positivo.cardgame21.data.repository.JogadorRepository
 import br.edu.positivo.cardgame21.data.repository.PartidaRepository
@@ -23,7 +26,16 @@ class AppContainer(context: Context) {
         database.partidaDao()
     )
 
-    val viewModelFactory = ViewModelFactory()
+    val sessao = SessaoUsuario()
+
+    val viewModelFactory = ViewModelFactory().apply {
+        register(AuthViewModel::class.java) {
+            AuthViewModel(jogadorRepository, sessao)
+        }
+        register(AdminViewModel::class.java) {
+            AdminViewModel(jogadorRepository, partidaRepository, sessao)
+        }
+    }
 
     private val retrofit = Retrofit.Builder()
         .baseUrl("https://deckofcardsapi.com/api/")

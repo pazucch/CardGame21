@@ -51,7 +51,8 @@ fun LoginScreen(
     onCriarConta: () -> Unit,
     onConvidado: () -> Unit,
     modifier: Modifier = Modifier,
-    mensagemErro: String? = null
+    mensagemErro: String? = null,
+    carregando: Boolean = false
 ) {
     var usuario by rememberSaveable { mutableStateOf("") }
     var senha by rememberSaveable { mutableStateOf("") }
@@ -114,7 +115,7 @@ fun LoginScreen(
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             CampoTexto(
-                rotulo = "Apelido ou e-mail",
+                rotulo = "Nome de Jogador",
                 valor = usuario,
                 onValorChange = { usuario = it },
                 placeholder = "ex.: jogador21"
@@ -135,9 +136,9 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            BotaoPrincipal("ENTRAR", { onEntrar(usuario, senha) }, Modifier.fillMaxWidth())
-            BotaoSecundario("Criar conta", onCriarConta, Modifier.fillMaxWidth())
-            BotaoLink("Jogar como convidado", onConvidado)
+            BotaoPrincipal(if (carregando) "AGUARDE..." else "ENTRAR", { if (!carregando) onEntrar(usuario, senha) }, Modifier.fillMaxWidth())
+            BotaoSecundario("Criar conta", { if (!carregando) onCriarConta() }, Modifier.fillMaxWidth())
+            BotaoLink("Jogar como convidado", { if (!carregando) onConvidado() })
         }
     }
 }

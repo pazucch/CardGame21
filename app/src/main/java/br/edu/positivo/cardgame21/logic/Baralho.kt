@@ -1,7 +1,7 @@
 
 package br.edu.positivo.cardgame21.logic
 
-class Baralho {
+class Baralho : FonteCartas {
 
     private val cartas = mutableListOf<Carta>()
 
@@ -9,7 +9,7 @@ class Baralho {
         reiniciar()
     }
 
-    fun reiniciar() {
+    override fun reiniciar() {
         cartas.clear()
 
         for (naipe in Naipe.entries) {
@@ -25,7 +25,7 @@ class Baralho {
         cartas.shuffle()
     }
 
-    fun comprarCarta(): Carta? {
+    override fun comprarCarta(): Carta? {
         if (cartas.isEmpty()) {
             return null
         }
@@ -33,7 +33,7 @@ class Baralho {
         return cartas.removeAt(cartas.lastIndex)
     }
 
-    fun cartasRestantes(): Int {
+    override fun cartasRestantes(): Int {
         return cartas.size
     }
 

@@ -3,21 +3,8 @@ package br.edu.positivo.cardgame21.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
@@ -37,28 +25,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import br.edu.positivo.cardgame21.ui.components.BarraTopo
-import br.edu.positivo.cardgame21.ui.components.BotaoPrincipal
-import br.edu.positivo.cardgame21.ui.components.BotaoSecundario
-import br.edu.positivo.cardgame21.ui.components.CartaCostas
-import br.edu.positivo.cardgame21.ui.components.CartaFrente
-import br.edu.positivo.cardgame21.ui.components.CartaMini
-import br.edu.positivo.cardgame21.ui.components.CartaVazia
-import br.edu.positivo.cardgame21.ui.components.FichaIcone
 import br.edu.positivo.cardgame21.logic.Naipe
-import br.edu.positivo.cardgame21.ui.components.Pilula
-import br.edu.positivo.cardgame21.ui.components.bordaTracejada
-import br.edu.positivo.cardgame21.ui.theme.Creme
-import br.edu.positivo.cardgame21.ui.theme.CremeTexto
-import br.edu.positivo.cardgame21.ui.theme.Dimens
-import br.edu.positivo.cardgame21.ui.theme.Dourado
-import br.edu.positivo.cardgame21.ui.theme.Jogo21Theme
-import br.edu.positivo.cardgame21.ui.theme.Preto
-import br.edu.positivo.cardgame21.ui.theme.Vermelho
-import br.edu.positivo.cardgame21.ui.theme.VerdeBorda
-import br.edu.positivo.cardgame21.ui.theme.VerdeMesa
-import br.edu.positivo.cardgame21.ui.theme.VerdePainel
-import br.edu.positivo.cardgame21.ui.theme.VerdeTextoSuave
+import br.edu.positivo.cardgame21.ui.components.*
+import br.edu.positivo.cardgame21.ui.theme.*
 
 data class JogadorNaMesaUIData(
     val nome: String,
@@ -74,187 +43,195 @@ fun JogoScreen(
     onParar: () -> Unit = {},
     nomeMesa: String = "Mesa K7Q2",
     apostaAtual: Int = 50,
+    saldo: Int = 1000,
     cartasVoce: List<Pair<String, Naipe>> = emptyList(),
     pontosVoce: Int = 0,
     jogadoresNaMesa: List<JogadorNaMesaUIData> = emptyList(),
-    cartasBanca: List<Pair<String, Naipe>> = listOf("?" to Naipe.ESPADAS), // Exemplo de carta virada
+    cartasBanca: List<Pair<String, Naipe>> = listOf("?" to Naipe.ESPADAS),
     pontosBanca: String = "?",
     nomeJogador: String = "Jogador",
     cartasRestantes: Int = 52,
     mensagemStatus: String = "Sua vez",
     dicaStatus: String = "Chegue o mais perto de 21 sem passar",
     onAumentarAposta: () -> Unit = {},
-    onDiminuirAposta: () -> Unit = {}
+    onDiminuirAposta: () -> Unit = {},
+    podeJogar: Boolean = true,
+    rodadaEncerrada: Boolean = false,
+    onNovaRodada: () -> Unit = {},
+    podeAlterarAposta: Boolean = false,
+    podeNovaRodada: Boolean = true,
+    informacao: String? = null,
+    erroSalvar: String? = null,
+    onTentarSalvar: () -> Unit = {},
+    onDescartarSalvamento: () -> Unit = {}
 ) {
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(VerdeMesa)
-            .systemBarsPadding()
+        modifier = modifier.fillMaxSize().background(VerdeMesa).systemBarsPadding()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = Dimens.PaddingTela, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        BarraTopo(
-            titulo = nomeMesa,
-            descricaoVoltar = "Sair da mesa",
-            onVoltar = onSair
-        ) { Pilula(apostaAtual.toString(), icone = { FichaIcone() }) }
-
-        // Banca
-        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text("BANCA", color = VerdeTextoSuave, fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
-                Text("Pontos: $pontosBanca", color = CremeTexto, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                // Cartas da banca
-                cartasBanca.forEach { (valor, naipe) ->
-                    if (valor == "?") CartaCostas() else CartaFrente(valor, naipe)
-                }
-                Spacer(Modifier.weight(1f))
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    CartaCostas(largura = 40.dp, altura = 58.dp)
-                    Text("Baralho: $cartasRestantes", color = VerdeTextoSuave, fontSize = 12.sp)
-                }
-            }
+        BarraTopo(nomeMesa, "Sair da mesa", onSair) {
+            Pilula(saldo.toString(), icone = { FichaIcone() })
         }
 
-        // Mensagem de status
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 52.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(Dourado)
-                .padding(horizontal = 14.dp, vertical = 8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(mensagemStatus, color = Preto, fontSize = 17.sp, fontWeight = FontWeight.Bold)
-            Text(dicaStatus, color = Color(0xFF2B2B2B), fontSize = 13.sp)
+        SecaoBanca(cartasBanca, pontosBanca, cartasRestantes)
+        StatusRodada(mensagemStatus, dicaStatus)
+
+        informacao?.let { Text(it, color = CremeTexto, fontSize = 14.sp) }
+        erroSalvar?.let {
+            Text(it, color = CremeTexto, fontSize = 14.sp)
+            BotaoPrincipal("TENTAR SALVAR NOVAMENTE", onTentarSalvar, Modifier.fillMaxWidth())
+            BotaoSecundario("CONTINUAR SEM SALVAR", onDescartarSalvamento, Modifier.fillMaxWidth())
         }
 
-        // Outros jogadores
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(IntrinsicSize.Min),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            jogadoresNaMesa.forEach { jogador ->
-                JogadorNaMesa(
-                    nome = jogador.nome,
-                    cartas = jogador.cartas,
-                    situacao = jogador.situacao,
-                    modifier = Modifier.weight(1f)
-                )
-            }
+        LugaresDaMesa(jogadoresNaMesa)
+        MaoJogador(nomeJogador, pontosVoce, cartasVoce, podeJogar)
+        ControleAposta(apostaAtual, podeAlterarAposta, onDiminuirAposta, onAumentarAposta)
 
-            // Preenche os lugares vazios até ter 2 oponentes na tela
-            val lugaresVazios = 2 - jogadoresNaMesa.size
-            if (lugaresVazios > 0) {
-                repeat(lugaresVazios) {
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
-                            .bordaTracejada(VerdeBorda, raio = 10.dp, espessura = 1.5.dp)
-                            .padding(8.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            "Lugar vazio",
-                            color = VerdeTextoSuave,
-                            fontSize = 12.sp,
-                            fontStyle = FontStyle.Italic,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
-            }
-        }
-
-        // Sua mão
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-                .background(VerdePainel)
-                .border(3.dp, Dourado, RoundedCornerShape(12.dp))
-                .padding(10.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text("VOCÊ · $nomeJogador", color = Dourado, fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
-                Text("Pontos: $pontosVoce", color = CremeTexto, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                cartasVoce.forEach { (valor, naipe) ->
-                    CartaFrente(valor, naipe)
-                }
-                CartaVazia("próxima carta")
-            }
-        }
-
-        // Aposta
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text("Aposta", color = CremeTexto, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                BotaoQuadrado("−", "Diminuir aposta", onDiminuirAposta)
-                Box(
-                    modifier = Modifier
-                        .size(52.dp)
-                        .clip(CircleShape)
-                        .background(Vermelho)
-                        .border(3.dp, Creme, CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(apostaAtual.toString(), color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.Bold)
-                }
-                BotaoQuadrado("+", "Aumentar aposta", onAumentarAposta)
-            }
-        }
-
-        // Ações
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             BotaoPrincipal(
-                texto = "PEDIR CARTA",
-                onClick = onPedirCarta,
-                modifier = Modifier.weight(1f),
-                altura = Dimens.AlturaBotaoJogo,
-                tamanhoTexto = 15.sp
+                "PEDIR CARTA", onPedirCarta, Modifier.weight(1f),
+                altura = Dimens.AlturaBotaoJogo, tamanhoTexto = 15.sp, enabled = podeJogar
             )
             BotaoSecundario(
-                texto = "PARAR",
-                onClick = onParar,
-                modifier = Modifier.weight(1f),
-                altura = Dimens.AlturaBotaoJogo,
-                tamanhoTexto = 15.sp
+                "PARAR", onParar, Modifier.weight(1f),
+                altura = Dimens.AlturaBotaoJogo, tamanhoTexto = 15.sp, enabled = podeJogar
             )
+        }
+        if (rodadaEncerrada) {
+            BotaoPrincipal("NOVA RODADA", onNovaRodada, Modifier.fillMaxWidth(), enabled = podeNovaRodada)
+        }
+    }
+}
+
+@Composable
+private fun SecaoBanca(
+    cartas: List<Pair<String, Naipe>>,
+    pontos: String,
+    cartasRestantes: Int
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        LinhaPontos("BANCA", pontos, VerdeTextoSuave)
+        Row(
+            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            cartas.forEach { (valor, naipe) ->
+                if (valor == "?") CartaCostas() else CartaFrente(valor, naipe)
+            }
+            Spacer(Modifier.weight(1f))
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                CartaCostas(largura = 40.dp, altura = 58.dp)
+                Text("Baralho: $cartasRestantes", color = VerdeTextoSuave, fontSize = 12.sp)
+            }
+        }
+    }
+}
+
+@Composable
+private fun LinhaPontos(titulo: String, pontos: String, corTitulo: Color) {
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Text(titulo, color = corTitulo, fontSize = 13.sp,
+            fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
+        Text("Pontos: $pontos", color = CremeTexto, fontSize = 14.sp,
+            fontWeight = FontWeight.SemiBold)
+    }
+}
+
+@Composable
+private fun StatusRodada(mensagem: String, dica: String) {
+    Column(
+        modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)
+            .clip(RoundedCornerShape(12.dp)).background(Dourado)
+            .padding(horizontal = 14.dp, vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(mensagem, color = Preto, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+        Text(dica, color = Color(0xFF2B2B2B), fontSize = 13.sp)
+    }
+}
+
+@Composable
+private fun LugaresDaMesa(jogadores: List<JogadorNaMesaUIData>) {
+    Row(
+        modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        jogadores.forEach { jogador ->
+            JogadorNaMesa(jogador.nome, jogador.cartas, jogador.situacao, Modifier.weight(1f))
+        }
+        repeat((2 - jogadores.size).coerceAtLeast(0)) {
+            Box(
+                modifier = Modifier.weight(1f).fillMaxHeight()
+                    .bordaTracejada(VerdeBorda, raio = 10.dp, espessura = 1.5.dp)
+                    .padding(8.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("Lugar vazio", color = VerdeTextoSuave, fontSize = 12.sp,
+                    fontStyle = FontStyle.Italic, textAlign = TextAlign.Center)
+            }
+        }
+    }
+}
+
+@Composable
+private fun MaoJogador(
+    nome: String,
+    pontos: Int,
+    cartas: List<Pair<String, Naipe>>,
+    podeJogar: Boolean
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
+            .background(VerdePainel).border(3.dp, Dourado, RoundedCornerShape(12.dp))
+            .padding(10.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        LinhaPontos("VOCÊ · $nome", pontos.toString(), Dourado)
+        Row(
+            modifier = Modifier.horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            cartas.forEach { (valor, naipe) -> CartaFrente(valor, naipe) }
+            if (podeJogar) CartaVazia("próxima carta")
+        }
+    }
+}
+
+@Composable
+private fun ControleAposta(
+    aposta: Int,
+    podeAlterar: Boolean,
+    diminuir: () -> Unit,
+    aumentar: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text("Aposta", color = CremeTexto, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            BotaoQuadrado("−", "Diminuir aposta", diminuir, podeAlterar && aposta > 10)
+            Box(
+                modifier = Modifier.size(52.dp).clip(CircleShape).background(Vermelho)
+                    .border(3.dp, Creme, CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(aposta.toString(), color = Color.White,
+                    fontSize = 17.sp, fontWeight = FontWeight.Bold)
+            }
+            BotaoQuadrado("+", "Aumentar aposta", aumentar,
+                podeAlterar && aposta <= Int.MAX_VALUE - 10)
         }
     }
 }
@@ -268,11 +245,8 @@ private fun JogadorNaMesa(
 ) {
     val forma = RoundedCornerShape(10.dp)
     Column(
-        modifier = modifier
-            .clip(forma)
-            .background(VerdePainel)
-            .border(2.dp, VerdeBorda, forma)
-            .padding(8.dp),
+        modifier = modifier.clip(forma).background(VerdePainel)
+            .border(2.dp, VerdeBorda, forma).padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         Text(nome, color = CremeTexto, fontSize = 13.sp, fontWeight = FontWeight.Bold)
@@ -286,15 +260,17 @@ private fun JogadorNaMesa(
 }
 
 @Composable
-private fun BotaoQuadrado(simbolo: String, descricao: String, onClick: () -> Unit) {
+private fun BotaoQuadrado(
+    simbolo: String,
+    descricao: String,
+    onClick: () -> Unit,
+    enabled: Boolean = true
+) {
     val forma = RoundedCornerShape(10.dp)
     Box(
-        modifier = Modifier
-            .size(44.dp)
-            .clip(forma)
-            .background(VerdePainel)
-            .border(2.dp, VerdeBorda, forma)
-            .clickable(role = Role.Button, onClick = onClick)
+        modifier = Modifier.size(44.dp).alpha(if (enabled) 1f else 0.4f)
+            .clip(forma).background(VerdePainel).border(2.dp, VerdeBorda, forma)
+            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
             .semantics { contentDescription = descricao },
         contentAlignment = Alignment.Center
     ) {

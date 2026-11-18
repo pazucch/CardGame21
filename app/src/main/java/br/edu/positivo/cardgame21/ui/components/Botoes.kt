@@ -30,10 +30,12 @@ fun BotaoPrincipal(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     altura: Dp = Dimens.AlturaBotao,
-    tamanhoTexto: TextUnit = 16.sp
+    tamanhoTexto: TextUnit = 16.sp,
+    enabled: Boolean = true
 ) {
     Button(
         onClick = onClick,
+        enabled = enabled,
         modifier = modifier.height(altura),
         shape = RoundedCornerShape(Dimens.RaioBotao),
         colors = ButtonDefaults.buttonColors(containerColor = Dourado, contentColor = Preto)
@@ -49,10 +51,12 @@ fun BotaoSecundario(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     altura: Dp = Dimens.AlturaBotao,
-    tamanhoTexto: TextUnit = 16.sp
+    tamanhoTexto: TextUnit = 16.sp,
+    enabled: Boolean = true
 ) {
     OutlinedButton(
         onClick = onClick,
+        enabled = enabled,
         modifier = modifier.height(altura),
         shape = RoundedCornerShape(Dimens.RaioBotao),
         border = BorderStroke(Dimens.Borda, Dourado),

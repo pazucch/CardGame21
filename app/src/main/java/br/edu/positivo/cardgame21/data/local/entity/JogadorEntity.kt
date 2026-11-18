@@ -12,5 +12,6 @@ data class JogadorEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val nome: String,
     val senhaHash: String = "",
-    val isAdmin: Boolean = false
+    val isAdmin: Boolean = false,
+    val saldo: Int = 1000
 )

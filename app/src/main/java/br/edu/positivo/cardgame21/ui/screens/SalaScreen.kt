@@ -60,7 +60,13 @@ fun SalaScreen(
     onCriarMesa: () -> Unit = {},
     onEntrarComCodigo: (String) -> Unit = {},
     onCompartilhar: () -> Unit = {},
-    nomeUsuario: String = "Convidado"
+    nomeUsuario: String = "Convidado",
+    modoLocal: Boolean = false,
+    podeIniciar: Boolean = false,
+    aposta: Int = 50,
+    onAumentarAposta: () -> Unit = {},
+    onDiminuirAposta: () -> Unit = {},
+    onFecharMesa: () -> Unit = {}
 ) {
     var codigo by rememberSaveable { mutableStateOf("") }
 
@@ -81,7 +87,7 @@ fun SalaScreen(
 
         BotaoPrincipal("CRIAR MESA", onCriarMesa, Modifier.fillMaxWidth())
 
-        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        if (!modoLocal) Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text("Entrar com código", color = CremeTexto, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -135,7 +141,7 @@ fun SalaScreen(
                         letterSpacing = 4.sp
                     )
                 }
-                BotaoSecundario(
+                if (!modoLocal) BotaoSecundario(
                     texto = "Compartilhar",
                     onClick = onCompartilhar,
                     altura = 44.dp,
@@ -145,12 +151,12 @@ fun SalaScreen(
 
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    "Jogadores (${jogadores.size} de $LUGARES_NA_MESA)",
+                    if (modoLocal) "Jogador da mesa" else "Jogadores (${jogadores.size} de $LUGARES_NA_MESA)",
                     color = CremeTexto,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
                 )
-                repeat(LUGARES_NA_MESA) { posicao ->
+                repeat(if (modoLocal) 1 else LUGARES_NA_MESA) { posicao ->
                     LinhaJogador(
                         nomeJogador = jogadores.getOrNull(posicao),
                         isAnfitriao = posicao == 0 // O primeiro da lista é o anfitrião
@@ -158,14 +164,27 @@ fun SalaScreen(
                 }
             }
 
-            Text("Mínimo de 2 jogadores para iniciar", color = VerdeTextoSuave, fontSize = 13.sp)
+            Text(
+                if (modoLocal) "Mesa local: você contra a banca. Crie uma mesa para iniciar."
+                else "Mínimo de 2 jogadores para iniciar",
+                color = VerdeTextoSuave, fontSize = 13.sp
+            )
+            if (modoLocal && codigoMesa.isNotBlank()) {
+                Text("Aposta: $aposta", color = Dourado, fontWeight = FontWeight.Bold)
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    BotaoSecundario("− 10", onDiminuirAposta, Modifier.weight(1f), enabled = podeIniciar && aposta > 10)
+                    BotaoSecundario("+ 10", onAumentarAposta, Modifier.weight(1f), enabled = podeIniciar && aposta <= Int.MAX_VALUE - 10)
+                }
+                BotaoSecundario("FECHAR MESA", onFecharMesa, Modifier.fillMaxWidth())
+            }
         }
 
         BotaoPrincipal(
             texto = "INICIAR PARTIDA",
             onClick = onIniciarPartida,
             modifier = Modifier.fillMaxWidth(),
-            altura = Dimens.AlturaBotaoJogo
+            altura = Dimens.AlturaBotaoJogo,
+            enabled = podeIniciar
         )
     }
 }
@@ -189,7 +208,7 @@ private fun LinhaJogador(nomeJogador: String?, isAnfitriao: Boolean = false) {
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = nomeJogador.first().uppercase(),
+                    text = nomeJogador.firstOrNull()?.uppercase() ?: "?",
                     color = if (isAnfitriao) Dourado else CremeTexto,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold

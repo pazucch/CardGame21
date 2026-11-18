@@ -90,10 +90,10 @@ interface JogadorDao {
     suspend fun inserirPartidaComSaldo(partida: PartidaEntity)
 
     @Transaction
-    suspend fun concluirRodada(partida: PartidaEntity, variacao: Int): Int {
+    suspend fun concluirRodada(partida: PartidaEntity): Int {
         if (partidaExiste(partida.id) == 0) {
-            if (variacao != 0) {
-                check(alterarSaldo(partida.jogadorId, variacao) == 1) {
+            if (partida.variacaoSaldo != 0) {
+                check(alterarSaldo(partida.jogadorId, partida.variacaoSaldo) == 1) {
                     "Saldo insuficiente ou jogador inexistente."
                 }
             }

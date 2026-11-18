@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import br.edu.positivo.cardgame21.logic.ResultadoRodada
 import br.edu.positivo.cardgame21.ui.components.BarraTopo
 import br.edu.positivo.cardgame21.ui.theme.*
 import br.edu.positivo.cardgame21.ui.viewmodel.PlacarItem
@@ -78,7 +79,30 @@ fun DetalhePartidaScreen(
 
             HorizontalDivider(color = VerdeBorda)
 
-            LinhaDetalhe(rotulo = "Pontuação final", valor = "${item.pontos} pts", destacar = true)
+            val partida = item.partida
+            val resultado = when (partida?.resultado) {
+                ResultadoRodada.VITORIA -> "Vitória"
+                ResultadoRodada.DERROTA -> "Derrota"
+                ResultadoRodada.EMPATE -> "Empate"
+                ResultadoRodada.DESCONHECIDO, null -> "Desconhecido"
+            }
+            val temDadosDaAposta = partida != null && partida.aposta > 0
+            LinhaDetalhe(
+                rotulo = "Pontuação final",
+                valor = partida?.let { "${it.pontos} pts" } ?: "Não registrada",
+                destacar = true
+            )
+            LinhaDetalhe(rotulo = "Resultado", valor = resultado)
+            LinhaDetalhe(
+                rotulo = "Aposta",
+                valor = partida?.aposta?.takeIf { temDadosDaAposta }?.toString() ?: "Não registrada"
+            )
+            LinhaDetalhe(
+                rotulo = "Variação do saldo",
+                valor = partida?.variacaoSaldo?.takeIf { temDadosDaAposta }?.let {
+                    if (it > 0) "+$it" else it.toString()
+                } ?: "Não registrada"
+            )
             LinhaDetalhe(rotulo = "Data e hora", valor = dataFormatada)
             LinhaDetalhe(rotulo = "ID da partida", valor = "#${item.partidaId}")
             LinhaDetalhe(rotulo = "ID do jogador", valor = "#${item.jogadorId}")

@@ -141,12 +141,9 @@ class JogadorRepository(
         }
     }
 
-    suspend fun concluirRodada(
-        partida: PartidaEntity,
-        variacao: Int
-    ): Result<Int> {
+    suspend fun concluirRodada(partida: PartidaEntity): Result<Int> {
         return try {
-            Result.success(jogadorDao.concluirRodada(partida, variacao))
+            Result.success(jogadorDao.concluirRodada(partida))
         } catch (erro: CancellationException) {
             throw erro
         } catch (erro: Exception) {

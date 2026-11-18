@@ -246,6 +246,7 @@ class GameViewModel(
             ResultadoRodada.VITORIA -> estado.aposta
             ResultadoRodada.DERROTA -> -estado.aposta
             ResultadoRodada.EMPATE -> 0
+            ResultadoRodada.DESCONHECIDO -> error("Resultado inválido para uma nova rodada.")
         }
 
         val novoSaldo = (estado.saldo.toLong() + variacao)
@@ -263,16 +264,16 @@ class GameViewModel(
         val id = jogadorId ?: return
         if (partidaRepository == null) return
 
-        if (resultado == ResultadoRodada.VITORIA) {
-            partidaPendente = PartidaEntity(
-                id = (UUID.randomUUID().mostSignificantBits and Long.MAX_VALUE)
-                    .coerceAtLeast(1),
-                jogadorId = id,
-                pontos = if (estado.pontosJogador > 21) 0 else estado.pontosJogador
-            )
+        partidaPendente = PartidaEntity(
+            id = (UUID.randomUUID().mostSignificantBits and Long.MAX_VALUE).coerceAtLeast(1),
+            jogadorId = id,
+            pontos = estado.pontosJogador,
+            resultado = resultado,
+            aposta = estado.aposta,
+            variacaoSaldo = variacao
+        )
 
-            salvarPartida()
-        }
+        salvarPartida()
     }
 
     private fun quantidadeRestante(): Int =
@@ -291,14 +292,8 @@ class GameViewModel(
         viewModelScope.launch {
             val jogadorRepo = jogadorRepository
 
-            val variacao = when (_uiState.value.resultado) {
-                ResultadoRodada.VITORIA -> _uiState.value.aposta
-                ResultadoRodada.DERROTA -> -_uiState.value.aposta
-                else -> 0
-            }
-
             val resultado = if (jogadorRepo != null) {
-                jogadorRepo.concluirRodada(partida, variacao)
+                jogadorRepo.concluirRodada(partida)
             } else {
                 repository.inserirPartida(partida)
                     .map { _uiState.value.saldo }

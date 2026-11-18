@@ -61,7 +61,7 @@ fun JogoRoute(onSair: () -> Unit, gameViewModel: GameViewModel) {
         ResultadoRodada.VITORIA -> "Você venceu!"
         ResultadoRodada.DERROTA -> if (estado.pontosJogador > 21) "Você estourou!" else "A banca venceu"
         ResultadoRodada.EMPATE -> "Empate!"
-        null -> if (estado.fase == FaseRodada.BANCA) "Vez da banca" else "Sua vez"
+        ResultadoRodada.DESCONHECIDO, null -> if (estado.fase == FaseRodada.BANCA) "Vez da banca" else "Sua vez"
     }
     JogoScreen(
         onSair = solicitarSaida,

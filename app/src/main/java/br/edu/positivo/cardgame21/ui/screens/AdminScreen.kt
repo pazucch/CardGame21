@@ -60,7 +60,12 @@ fun AdminScreen(
                     Column(Modifier.fillMaxWidth().padding(12.dp)) {
                         val nome = estado.jogadores.find { it.id == partida.jogadorId }?.nome ?: "Jogador ${partida.jogadorId}"
                         Text("Partida #${partida.id} • $nome", color = CremeTexto)
-                        Text("${partida.pontos} pontos", color = CremeTexto)
+                        Text("${partida.pontos} pontos · ${partida.resultado.name}", color = CremeTexto)
+                        if (partida.aposta > 0) {
+                            val variacao = partida.variacaoSaldo
+                            val saldo = if (variacao > 0) "+$variacao" else variacao.toString()
+                            Text("Aposta: ${partida.aposta} · Variação do saldo: $saldo", color = CremeTexto)
+                        }
                         Row {
                             TextButton(onClick = { partidaEdicao = partida }, enabled = !estado.carregando) { Text("Editar") }
                             TextButton(onClick = { exclusaoPartida = partida }, enabled = !estado.carregando) { Text("Excluir") }

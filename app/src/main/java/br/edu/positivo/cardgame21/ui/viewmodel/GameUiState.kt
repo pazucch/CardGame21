@@ -4,7 +4,7 @@ import br.edu.positivo.cardgame21.logic.Carta
 import br.edu.positivo.cardgame21.logic.Pontuacao
 
 enum class FaseRodada { AGUARDANDO, JOGADOR, BANCA, ENCERRADA }
-enum class ResultadoRodada { VITORIA, DERROTA, EMPATE }
+typealias ResultadoRodada = br.edu.positivo.cardgame21.logic.ResultadoRodada
 
 data class GameUiState(
     val codigoMesa: String = "",

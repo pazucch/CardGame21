@@ -2,13 +2,14 @@ package br.edu.positivo.cardgame21.ui.viewmodel
 
 import br.edu.positivo.cardgame21.data.local.entity.JogadorEntity
 import br.edu.positivo.cardgame21.data.local.entity.PartidaEntity
+import br.edu.positivo.cardgame21.logic.ResultadoRodada
 
 const val NOME_JOGADOR_REMOVIDO = "Jogador removido"
 
 fun montarRanking(
     partidas: List<PartidaEntity>,
     jogadores: List<JogadorEntity>,
-    ehVitoria: (PartidaEntity) -> Boolean = { true }
+    ehVitoria: (PartidaEntity) -> Boolean = { it.resultado == ResultadoRodada.VITORIA }
 ): List<PlacarItem> {
     val nomesPorId = jogadores.associate { it.id to it.nome }
 
@@ -25,7 +26,8 @@ fun montarRanking(
                 jogadorId = jogadorId,
                 nome = nomesPorId[jogadorId] ?: NOME_JOGADOR_REMOVIDO,
                 pontos = totalVitorias,
-                dataPartida = ultimaPartida.dataPartida
+                dataPartida = ultimaPartida.dataPartida,
+                partida = ultimaPartida
             )
         }
         .sortedBy { it.dataPartida }

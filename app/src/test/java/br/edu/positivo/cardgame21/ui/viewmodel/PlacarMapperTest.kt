@@ -12,7 +12,13 @@ class PlacarMapperTest {
     private val joao = JogadorEntity(id = 2, nome = "joão")
 
     private fun partida(id: Long, jogadorId: Long, pontos: Int, data: Long) =
-        PartidaEntity(id = id, jogadorId = jogadorId, pontos = pontos, dataPartida = data)
+        PartidaEntity(
+            id = id,
+            jogadorId = jogadorId,
+            pontos = pontos,
+            dataPartida = data,
+            resultado = ResultadoRodada.VITORIA
+        )
 
     @Test
     fun listasVazias_geramRankingVazio() {
@@ -33,6 +39,23 @@ class PlacarMapperTest {
         assertEquals(listOf(2, 1), ranking.map { it.pontos })
         assertEquals(listOf(1, 2), ranking.map { it.posicao })
         assertEquals(listOf("maria", "joão"), ranking.map { it.nome })
+    }
+
+    @Test
+    fun contaApenasVitoriasEMantemAPontuacaoDaPartida() {
+        val vitoria = partida(1, 1, 20, 100)
+        val ranking = montarRanking(
+            partidas = listOf(
+                vitoria,
+                partida(2, 1, 24, 200).copy(resultado = ResultadoRodada.DERROTA),
+                partida(3, 1, 19, 300).copy(resultado = ResultadoRodada.EMPATE),
+                partida(4, 2, 21, 400).copy(resultado = ResultadoRodada.DESCONHECIDO)
+            ),
+            jogadores = listOf(maria, joao)
+        )
+
+        assertEquals(1, ranking.single().pontos)
+        assertEquals(vitoria, ranking.single().partida)
     }
 
     @Test

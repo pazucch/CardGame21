@@ -22,7 +22,6 @@ class PlacarViewModel(
     private val _uiState = MutableStateFlow(PlacarUiState())
     val uiState: StateFlow<PlacarUiState> = _uiState.asStateFlow()
 
-    // Entradas da tela: o que o usuário digita e qual chip está selecionado.
     private val _busca = MutableStateFlow("")
     private val _filtro = MutableStateFlow(FiltroPlacar.TODAS)
 
@@ -38,8 +37,14 @@ class PlacarViewModel(
         _filtro.value = filtro
     }
 
-    // Combina 4 fontes: partidas e jogadores (Room) + busca e filtro (tela).
-    // Qualquer uma que mude reemite e o estado é recalculado sozinho.
+    fun aoSelecionarPartida(item: PlacarItem) {
+        _uiState.update { it.copy(partidaSelecionada = item) }
+    }
+
+    fun aoFecharDetalhe() {
+        _uiState.update { it.copy(partidaSelecionada = null) }
+    }
+
     private fun observarPlacar() {
         viewModelScope.launch {
             combine(
@@ -48,12 +53,14 @@ class PlacarViewModel(
                 _busca,
                 _filtro
             ) { partidas, jogadores, busca, filtro ->
+                val detalheAtual = _uiState.value.partidaSelecionada
                 val falha = partidas.exceptionOrNull() ?: jogadores.exceptionOrNull()
                 if (falha != null) {
                     PlacarUiState(
                         carregando = false,
                         busca = busca,
                         filtro = filtro,
+                        partidaSelecionada = detalheAtual,
                         erro = mensagemDe(falha)
                     )
                 } else {
@@ -67,13 +74,19 @@ class PlacarViewModel(
                         itens = visiveis,
                         metricas = calcularMetricas(visiveis),
                         busca = busca,
-                        filtro = filtro
+                        filtro = filtro,
+                        partidaSelecionada = detalheAtual
                     )
                 }
             }
                 .catch { falha ->
-                    // Rede de segurança: nada que falhe aqui pode derrubar o app.
-                    emit(PlacarUiState(carregando = false, erro = mensagemDe(falha)))
+                    emit(
+                        PlacarUiState(
+                            carregando = false,
+                            partidaSelecionada = _uiState.value.partidaSelecionada,
+                            erro = mensagemDe(falha)
+                        )
+                    )
                 }
                 .collect { novo -> _uiState.update { novo } }
         }
@@ -86,8 +99,6 @@ class PlacarViewModel(
 
 private const val UM_DIA_MS = 24L * 60 * 60 * 1000
 
-// filter (período) -> filter (nome) -> sortedBy (mantém a ordem do ranking).
-// A posição NÃO é recalculada: quem é #1 continua #1 mesmo ao buscar por outro nome.
 private fun List<PlacarItem>.filtrarPor(
     busca: String,
     filtro: FiltroPlacar
@@ -105,7 +116,6 @@ private fun List<PlacarItem>.filtrarPor(
         .sortedBy { it.posicao }
 }
 
-// map + distinct + maxOf + average sobre a lista já filtrada.
 private fun calcularMetricas(itens: List<PlacarItem>): PlacarMetricas =
     if (itens.isEmpty()) {
         PlacarMetricas()

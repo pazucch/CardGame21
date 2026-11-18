@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Update
 import androidx.room.Transaction
 import br.edu.positivo.cardgame21.data.local.entity.JogadorEntity
+import br.edu.positivo.cardgame21.data.local.entity.PartidaEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -71,5 +72,37 @@ interface JogadorDao {
         inserir(administrador)
 
         return true
+    }
+
+    @Query("SELECT saldo FROM jogadores WHERE id = :id")
+    suspend fun buscarSaldo(id: Long): Int?
+
+    @Query("""
+    UPDATE jogadores
+    SET saldo = saldo + :variacao
+    WHERE id = :id
+      AND saldo + :variacao BETWEEN 0 AND 2147483647
+    """)
+    suspend fun alterarSaldo(id: Long, variacao: Int): Int
+
+    @Query("SELECT COUNT(*) FROM partidas WHERE id = :id")
+    suspend fun partidaExiste(id: Long): Int
+
+    @Insert
+    suspend fun inserirPartidaComSaldo(partida: PartidaEntity)
+
+    @Transaction
+    suspend fun concluirRodada(partida: PartidaEntity, variacao: Int): Int {
+        if (partidaExiste(partida.id) == 0) {
+            if (variacao != 0) {
+                check(alterarSaldo(partida.jogadorId, variacao) == 1) {
+                    "Saldo insuficiente ou jogador inexistente."
+                }
+            }
+            inserirPartidaComSaldo(partida)
+        }
+
+        return buscarSaldo(partida.jogadorId)
+            ?: error("Jogador não encontrado.")
     }
 }

@@ -43,8 +43,10 @@ class JogadorRepository(
     suspend fun buscarPorNome(nome: String): Result<JogadorEntity?> {
         return try {
             Result.success(jogadorDao.buscaPorNome(nome))
-        } catch (e: Exception) {
-            Result.failure(e)
+        } catch (erro: CancellationException) {
+            throw erro
+        } catch (erro: Exception) {
+            Result.failure(ErrorHandler.tratar(erro))
         }
     }
 

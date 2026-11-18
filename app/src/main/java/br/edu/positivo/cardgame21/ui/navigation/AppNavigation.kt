@@ -3,122 +3,106 @@ package br.edu.positivo.cardgame21.ui.navigation
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.*
+import br.edu.positivo.cardgame21.CardGameApplication
 import br.edu.positivo.cardgame21.ui.screens.*
+import br.edu.positivo.cardgame21.ui.viewmodel.*
 
 private data class ItemBarra(val rota: String, val rotulo: String, val icone: ImageVector)
 
-// Só os destinos principais aparecem na barra (e só neles a barra é exibida).
-// TODO (Admin/Perfil): adicionar aqui a aba de Perfil/Admin, mostrada conforme isAdmin.
-private val itensBarra = listOf(
-    ItemBarra(Rotas.SALA, "Sala", Icons.Filled.Home),
-    ItemBarra(Rotas.PLACAR, "Ranking", Icons.Filled.Star)
-)
-
-// Troca de aba mantendo a Sala como base da pilha (e não o Login).
 private fun NavHostController.irParaAba(rota: String) {
     navigate(rota) {
-        popUpTo(Rotas.SALA) { saveState = true }
+        popUpTo(Rotas.SALA)
         launchSingleTop = true
-        restoreState = true
-    }
-}
-
-// Depois do login, remove o Login da pilha: o botão voltar não retorna a ele.
-private fun NavHostController.entrarNaSala() {
-    navigate(Rotas.SALA) {
-        popUpTo(Rotas.LOGIN) { inclusive = true }
-    }
-}
-
-// Sair da conta: limpa a pilha e volta ao Login.
-private fun NavHostController.sairDaConta() {
-    navigate(Rotas.LOGIN) {
-        popUpTo(Rotas.SALA) { inclusive = true }
     }
 }
 
 @Composable
 fun AppNavigation() {
+    val container = (LocalContext.current.applicationContext as CardGameApplication).container
+    val auth: AuthViewModel = viewModel(factory = container.viewModelFactory)
+    val estado by auth.uiState.collectAsState()
+    val perfil = estado.perfil
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = backStackEntry?.destination?.route
+    val rota = backStackEntry?.destination?.route
+    val itens = listOf(
+        ItemBarra(Rotas.SALA, "Sala", Icons.Filled.Home),
+        ItemBarra(Rotas.PLACAR, "Ranking", Icons.Filled.Star),
+        ItemBarra(Rotas.PERFIL, "Perfil", Icons.Filled.Person)
+    ) + if (perfil.isAdmin) listOf(ItemBarra(Rotas.ADMIN, "Admin", Icons.Filled.Settings)) else emptyList()
 
-    Scaffold(
-        bottomBar = {
-            if (itensBarra.any { it.rota == currentRoute }) {
-                NavigationBar {
-                    itensBarra.forEach { item ->
-                        NavigationBarItem(
-                            icon = { Icon(item.icone, contentDescription = item.rotulo) },
-                            label = { Text(item.rotulo) },
-                            selected = currentRoute == item.rota,
-                            onClick = { navController.irParaAba(item.rota) }
-                        )
-                    }
-                }
+    // Não renderiza destinos protegidos enquanto redireciona (inclui restauração da pilha).
+    LaunchedEffect(perfil.autenticado, perfil.isAdmin, rota) {
+        val destino = when {
+            !perfil.autenticado && rota != null && rota !in listOf(Rotas.LOGIN, Rotas.CRIAR_USUARIO) -> Rotas.LOGIN
+            perfil.autenticado && rota in listOf(Rotas.LOGIN, Rotas.CRIAR_USUARIO) -> Rotas.SALA
+            rota == Rotas.ADMIN && !perfil.isAdmin -> if (perfil.autenticado) Rotas.SALA else Rotas.LOGIN
+            else -> null
+        }
+        if (destino != null) navController.navigate(destino) {
+            popUpTo(navController.graph.id) { inclusive = true }
+            launchSingleTop = true
+        }
+    }
+
+    Scaffold(bottomBar = {
+        if (perfil.autenticado && itens.any { it.rota == rota }) NavigationBar {
+            itens.forEach { item ->
+                NavigationBarItem(selected = rota == item.rota,
+                    onClick = { navController.irParaAba(item.rota) },
+                    icon = { Icon(item.icone, contentDescription = item.rotulo) },
+                    label = { Text(item.rotulo) })
             }
         }
-    ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = Rotas.LOGIN,
-            modifier = Modifier.padding(innerPadding)
-        ) {
+    }) { padding ->
+        NavHost(navController, startDestination = Rotas.LOGIN, modifier = Modifier.padding(padding)) {
             composable(Rotas.LOGIN) {
-                LoginScreen(
-                    onEntrar = { _, _ -> navController.entrarNaSala() },
-                    onCriarConta = { navController.navigate(Rotas.CRIAR_USUARIO) },
-                    onConvidado = { navController.entrarNaSala() }
-                )
+                LoginScreen(onEntrar = auth::entrar,
+                    onCriarConta = { auth.limparErro(); navController.navigate(Rotas.CRIAR_USUARIO) },
+                    onConvidado = auth::entrarComoConvidado,
+                    mensagemErro = estado.mensagemErro, carregando = estado.carregando)
             }
-
             composable(Rotas.CRIAR_USUARIO) {
-                CriarUsuarioScreen(
-                    onVoltar = { navController.popBackStack() },
-                    onSalvarUsuario = { _, _, _ -> navController.popBackStack() }
-                )
+                CriarUsuarioScreen(onVoltar = { auth.limparErro(); navController.popBackStack() },
+                    onSalvarUsuario = { nome, senha, _ -> auth.cadastrar(nome, senha) },
+                    mensagemErro = estado.mensagemErro, carregando = estado.carregando)
             }
-
             composable(Rotas.SALA) {
-                SalaScreen(
-                    onVoltar = { navController.sairDaConta() },
+                if (perfil.autenticado) SalaScreen(onVoltar = auth::sair,
                     onIniciarPartida = { navController.navigate(Rotas.JOGO) },
-                    onCriarMesa = { navController.navigate(Rotas.CRIAR_MESA) }
-                )
+                    onCriarMesa = { navController.navigate(Rotas.CRIAR_MESA) })
             }
-
             composable(Rotas.CRIAR_MESA) {
-                CriarMesaScreen(
-                    onVoltar = { navController.popBackStack() },
-                    onCriarMesa = { _ -> navController.popBackStack() }
-                )
+                if (perfil.autenticado) CriarMesaScreen(onVoltar = { navController.popBackStack() },
+                    onCriarMesa = { _ -> navController.popBackStack() })
             }
-
             composable(Rotas.JOGO) {
-                JogoScreen(
-                    onSair = { navController.popBackStack() }
-                )
+                if (perfil.autenticado) JogoScreen(onSair = { navController.popBackStack() })
             }
-
             composable(Rotas.PLACAR) {
-                PlacarScreen(
-                    onVoltar = { navController.popBackStack() }
-                )
+                if (perfil.autenticado) PlacarScreen(onVoltar = { navController.popBackStack() })
+            }
+            composable(Rotas.PERFIL) {
+                if (perfil.autenticado) PerfilScreen(perfil, auth::sair)
+            }
+            composable(Rotas.ADMIN) {
+                if (perfil.isAdmin) {
+                    val admin: AdminViewModel = viewModel(factory = container.viewModelFactory)
+                    val adminState by admin.uiState.collectAsState()
+                    AdminScreen(adminState, admin::atualizarJogador, admin::excluirJogador,
+                        admin::atualizarPartida, admin::excluirPartida, admin::limparMensagem)
+                }
             }
         }
     }

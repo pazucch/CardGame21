@@ -171,7 +171,26 @@ fun AppNavigation() {
 
             composable(Rotas.PLACAR) {
                 if (perfil.autenticado) {
-                    PlacarScreen(onVoltar = { navController.popBackStack() })
+                    val placarViewModel: PlacarViewModel =
+                        viewModel(factory = container.viewModelFactory)
+
+                    val placarState by placarViewModel.uiState.collectAsState()
+                    val selecionada = placarState.partidaSelecionada
+
+                    if (selecionada != null) {
+                        DetalhePartidaScreen(
+                            item = selecionada,
+                            onVoltar = placarViewModel::aoFecharDetalhe
+                        )
+                    } else {
+                        PlacarScreen(
+                            uiState = placarState,
+                            onBuscaChange = placarViewModel::aoMudarBusca,
+                            onFiltroChange = placarViewModel::aoSelecionarFiltro,
+                            onVoltar = { navController.popBackStack() },
+                            onItemClick = placarViewModel::aoSelecionarPartida
+                        )
+                    }
                 }
             }
 

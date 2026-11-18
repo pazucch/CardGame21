@@ -7,6 +7,7 @@ enum class FaseRodada { AGUARDANDO, JOGADOR, BANCA, ENCERRADA }
 typealias ResultadoRodada = br.edu.positivo.cardgame21.logic.ResultadoRodada
 
 data class GameUiState(
+    val erroCriarMesa: String? = null,
     val codigoMesa: String = "",
     val nomeJogador: String = "Convidado",
     val cartasJogador: List<Carta> = emptyList(),

@@ -132,6 +132,7 @@ fun AppNavigation() {
                             }
                         },
                         onCriarMesa = {
+                            gameViewModel.limparErroCriarMesa()
                             navController.navigate(Rotas.CRIAR_MESA)
                         },
                         nomeUsuario = jogo.nomeJogador,
@@ -150,6 +151,10 @@ fun AppNavigation() {
             composable(Rotas.CRIAR_MESA) {
                 if (perfil.autenticado) {
                     CriarMesaScreen(
+                        saldo = jogo.saldo,
+                        mensagemErro = jogo.erroCriarMesa,
+                        carregando = jogo.ocupado,
+                        onAlterarAposta = gameViewModel::limparErroCriarMesa,
                         onVoltar = { navController.popBackStack() },
                         onCriarMesa = { aposta ->
                             if (gameViewModel.criarMesa(aposta)) {

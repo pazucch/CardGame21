@@ -60,11 +60,18 @@ class GameViewModel(
 
     fun criarMesa(aposta: Int): Boolean {
         val estado = _uiState.value
-        if (estado.ocupado) return false
-        if (estado.fase == FaseRodada.JOGADOR ||
-            estado.fase == FaseRodada.BANCA) return false
-        if (aposta < 10 || aposta % 10 != 0) return false
-        if (aposta > estado.saldo) return false
+        val erro = when {
+            estado.ocupado -> "Aguarde a operação atual terminar."
+            estado.fase == FaseRodada.JOGADOR || estado.fase == FaseRodada.BANCA ->
+                "Encerre a rodada atual antes de criar outra mesa."
+            aposta < 10 || aposta % 10 != 0 -> "A aposta deve ser de pelo menos 10 e múltipla de 10."
+            aposta > estado.saldo -> "Saldo insuficiente. Seu saldo é ${estado.saldo} e a aposta escolhida é $aposta."
+            else -> null
+        }
+        if (erro != null) {
+            _uiState.value = estado.copy(erroCriarMesa = erro)
+            return false
+        }
         partidaPendente = null
         _uiState.value = GameUiState(
             codigoMesa = UUID.randomUUID().toString().take(8).uppercase(),
@@ -74,6 +81,10 @@ class GameViewModel(
             aviso = estado.aviso
         )
         return true
+    }
+
+    fun limparErroCriarMesa() {
+        _uiState.value = _uiState.value.copy(erroCriarMesa = null)
     }
 
     fun iniciarPartida(): Boolean {

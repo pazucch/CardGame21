@@ -8,6 +8,21 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class GameViewModelTest {
+    @Test fun apostaAcimaDoSaldoMostraErroEPermiteCorrigir() {
+        val vm = GameViewModel()
+        assertTrue(vm.criarMesa(50))
+        val mesaOriginal = vm.uiState.value.codigoMesa
+        assertFalse(vm.criarMesa(1010))
+        assertEquals(mesaOriginal, vm.uiState.value.codigoMesa)
+        assertEquals(1000, vm.uiState.value.saldo)
+        assertNotNull(vm.uiState.value.erroCriarMesa)
+        vm.limparErroCriarMesa()
+        assertNull(vm.uiState.value.erroCriarMesa)
+        assertTrue(vm.criarMesa(1000))
+        assertEquals(1000, vm.uiState.value.aposta)
+        assertNull(vm.uiState.value.erroCriarMesa)
+    }
+
     private fun jogo(vararg valores: Int): GameViewModel {
         val cartas = valores.map { pontos ->
             Carta(Naipe.COPAS, ValorCarta.entries.first { it.pontos == pontos })

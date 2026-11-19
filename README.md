@@ -1,8 +1,10 @@
 # CardGame21
 
-[Português](#português) \| [English](#english)
+[License](#licença--license) | [Screenshots](#capturas-de-tela--screenshots)
 
 ## Português
+
+[English](#english)
 
 O **CardGame21** é um jogo de Blackjack (21) para Android que fizemos em equipe no curso de Análise e Desenvolvimento de Sistemas da Universidade Positivo. A proposta era criar um jogo simples e, ao mesmo tempo, colocar em prática o que aprendemos sobre desenvolvimento Android.
 
@@ -28,7 +30,7 @@ As dependências já estão configuradas em `app/build.gradle.kts` e `gradle/lib
 - **Retrofit e Gson Converter:** comunicação com a API e leitura do JSON.
 - **JUnit, AndroidX Test e Espresso:** testes unitários e instrumentados.
 
-Seguimos o padrão **MVVM**, separando telas, ViewModels, repositórios e fontes de dados. As versões das bibliotecas ficam no `build.gradle.kts` e em `gradle/libs.versions.toml`.
+Seguimos o padrão **MVVM**, separando telas, ViewModels, repositórios e fontes de dados.
 
 ### API e armazenamento
 
@@ -42,14 +44,14 @@ Você precisa do **Android Studio**, do SDK Android e de um dispositivo ou emula
 
 Abra a pasta no Android Studio, sincronize o Gradle e execute o módulo `app`.
 
-**Para rodar os testes**:
+**Para rodar os testes:**
 
 ```bash
 ./gradlew testDebugUnitTest
 ./gradlew connectedDebugAndroidTest
 ```
 
-No Windows, use `./gradlew.bat`. Os testes instrumentados precisam de um dispositivo ou emulador conectado.
+No Windows, use `.\gradlew.bat`. Os testes instrumentados precisam de um dispositivo ou emulador conectado.
 
 ### Equipe
 
@@ -58,6 +60,8 @@ No Windows, use `./gradlew.bat`. Os testes instrumentados precisam de um disposi
 ---
 
 ## English
+
+[Português](#português)
 
 **CardGame21** is an Android Blackjack (21) game we built as a team project for our Systems Analysis and Development course at Universidade Positivo. We wanted something fun to play while practicing Android development along the way.
 
@@ -83,7 +87,7 @@ All dependencies are already configured in `app/build.gradle.kts` and `gradle/li
 - **Retrofit and Gson Converter:** API requests and JSON parsing.
 - **JUnit, AndroidX Test, and Espresso:** unit and instrumented tests.
 
-We use **MVVM** to keep screens, ViewModels, repositories, and data sources separate. Library versions are listed in `build.gradle.kts` and `gradle/libs.versions.toml`.
+We use **MVVM** to keep screens, ViewModels, repositories, and data sources separate.
 
 ### API and local data
 
@@ -97,18 +101,31 @@ You'll need **Android Studio**, the Android SDK, and a device or emulator runnin
 
 Open the project in Android Studio, sync Gradle, and run the `app` module.
 
-**To run the tests**:
+**To run the tests:**
 
 ```bash
 ./gradlew testDebugUnitTest
 ./gradlew connectedDebugAndroidTest
 ```
 
-On Windows, use `./gradlew.bat`. Instrumented tests require a connected device or emulator.
+On Windows, use `.\gradlew.bat`. Instrumented tests require a connected device or emulator.
 
 ### Team
 
 [pazucch](https://github.com/pazucch) · [VonRyn](https://github.com/VonRyn) · [Ellyvc23](https://github.com/Ellyvc23) · [andreguerraa](https://github.com/andreguerraa)
+
+---
+
+## Capturas de tela / Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/login.jpg" width="180" alt="Login / Login screen">
+  <img src="docs/screenshots/sala.jpg" width="180" alt="Sala / Table setup">
+  <img src="docs/screenshots/jogo.jpg" width="180" alt="Partida / Gameplay">
+  <img src="docs/screenshots/ranking.jpg" width="180" alt="Ranking / Leaderboard">
+</p>
+
+<p align="center"><sub>Login · Sala/Table · Partida/Game · Ranking</sub></p>
 
 ---
 

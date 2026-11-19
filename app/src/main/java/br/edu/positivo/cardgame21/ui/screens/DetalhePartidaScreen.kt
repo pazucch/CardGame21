@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,8 +30,9 @@ fun DetalhePartidaScreen(
     onVoltar: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val dataFormatada = remember(item.dataPartida) {
-        val formato = SimpleDateFormat("dd/MM/yyyy 'às' HH:mm", Locale.getDefault())
+    val locale = LocalConfiguration.current.locales[0] ?: Locale.ROOT
+    val dataFormatada = remember(item.dataPartida, locale) {
+        val formato = SimpleDateFormat("dd/MM/yyyy 'às' HH:mm", locale)
         formato.format(Date(item.dataPartida))
     }
 
@@ -88,9 +90,13 @@ fun DetalhePartidaScreen(
             }
             val temDadosDaAposta = partida != null && partida.aposta > 0
             LinhaDetalhe(
-                rotulo = "Pontuação final",
-                valor = partida?.let { "${it.pontos} pts" } ?: "Não registrada",
+                rotulo = "Vitórias no ranking",
+                valor = "${item.pontos} ${if (item.pontos == 1) "vitória" else "vitórias"}",
                 destacar = true
+            )
+            LinhaDetalhe(
+                rotulo = "Pontuação da última partida",
+                valor = partida?.let { "${it.pontos} pts" } ?: "Não registrada"
             )
             LinhaDetalhe(rotulo = "Resultado", valor = resultado)
             LinhaDetalhe(

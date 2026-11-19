@@ -27,6 +27,7 @@ import br.edu.positivo.cardgame21.ui.viewmodel.PlacarItem
 import br.edu.positivo.cardgame21.ui.viewmodel.PlacarMetricas
 import br.edu.positivo.cardgame21.ui.viewmodel.PlacarUiState
 import java.util.Locale
+import androidx.compose.ui.platform.LocalConfiguration
 
 @Composable
 fun PlacarScreen(
@@ -189,7 +190,8 @@ fun PlacarScreen(
 
 @Composable
 private fun ResumoMetricasPlacar(metricas: PlacarMetricas) {
-    val mediaFormatada = String.format(Locale.getDefault(), "%.1f", metricas.mediaPontos)
+    val locale = LocalConfiguration.current.locales[0] ?: Locale.ROOT
+    val mediaFormatada = String.format(locale, "%.1f", metricas.mediaPontos)
     Row(
         modifier = Modifier
             .fillMaxWidth()

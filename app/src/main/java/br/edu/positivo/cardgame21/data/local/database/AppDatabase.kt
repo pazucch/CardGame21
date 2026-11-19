@@ -34,7 +34,6 @@ abstract class AppDatabase : RoomDatabase() {
 
         private val MIGRATION_3_4 = object : Migration(3, 4) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                // As partidas antigas não permitem reconstruir o resultado nem a aposta.
                 db.execSQL("ALTER TABLE partidas ADD COLUMN resultado TEXT NOT NULL DEFAULT 'DESCONHECIDO'")
                 db.execSQL("ALTER TABLE partidas ADD COLUMN aposta INTEGER NOT NULL DEFAULT 0")
                 db.execSQL("ALTER TABLE partidas ADD COLUMN variacaoSaldo INTEGER NOT NULL DEFAULT 0")

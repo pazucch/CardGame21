@@ -21,13 +21,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import br.edu.positivo.cardgame21.ui.components.BarraTopo
 import br.edu.positivo.cardgame21.ui.components.BotaoPrincipal
+import br.edu.positivo.cardgame21.ui.components.CaixaErro
 import br.edu.positivo.cardgame21.ui.theme.*
 
 @Composable
 fun CriarMesaScreen(
     onVoltar: () -> Unit,
     onCriarMesa: (aposta: Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    saldo: Int = 1000,
+    mensagemErro: String? = null,
+    carregando: Boolean = false,
+    onAlterarAposta: () -> Unit = {}
 ) {
     var aposta by rememberSaveable { mutableStateOf(50) }
 
@@ -57,13 +62,17 @@ fun CriarMesaScreen(
             Text("Configurações da Mesa", color = Dourado, fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
             Text("Valor da Aposta Inicial", color = CremeTexto, fontSize = 15.sp)
+            Text("Saldo disponível: $saldo", color = CremeTexto, fontSize = 15.sp)
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                BotaoQuadradoCriarMesa("-", enabled = aposta > 10) { aposta -= 10 }
+                BotaoQuadradoCriarMesa("-", enabled = !carregando && aposta > 10) {
+                    aposta -= 10
+                    onAlterarAposta()
+                }
                 Spacer(modifier = Modifier.width(20.dp))
                 Box(
                     modifier = Modifier
@@ -75,16 +84,21 @@ fun CriarMesaScreen(
                     Text("$aposta", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 }
                 Spacer(modifier = Modifier.width(20.dp))
-                BotaoQuadradoCriarMesa("+", enabled = aposta <= Int.MAX_VALUE - 10) { aposta += 10 }
+                BotaoQuadradoCriarMesa("+", enabled = !carregando && aposta <= Int.MAX_VALUE - 10) {
+                    aposta += 10
+                    onAlterarAposta()
+                }
             }
         }
 
         Spacer(modifier = Modifier.weight(1f))
+        mensagemErro?.let { CaixaErro(it) }
 
         BotaoPrincipal(
             texto = "ABRIR MESA",
             onClick = { onCriarMesa(aposta) },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !carregando
         )
     }
 }
